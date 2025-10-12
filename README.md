@@ -1,16 +1,38 @@
-# React + Vite
+![Finagler Banner](readme_page1.png)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-Currently, two official plugins are available:
+# 🧩 DIS-DOMAIN-CONSOLE (Codename: Finagler)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+**Version:** v0.2  
+**Status:** Active Development  
+**Author:** Rick Fleischman ([@RickF71](https://github.com/RickF71))
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 🌐 Overview
 
-## Expanding the ESLint configuration
+**DIS-DOMAIN-CONSOLE**, codename **Finagler**, is the first *visual management layer* for the [DIS-CORE](https://github.com/RickF71/dis-core) network.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+It provides a tactile web interface for exploring, linking, and managing nodes within a distributed sovereignty system — a real-time dashboard that lets humans see and shape what the DIS node already knows.
+
+---
+
+### ⚙️ Tech Stack
+
+| Layer | Technology |
+|-------|-------------|
+| Frontend | React + Vite |
+| Styling | TailwindCSS |
+| Backend API | [DIS-CORE](https://github.com/RickF71/dis-core) (Go) |
+| Runtime | Node.js v22+, npm v11+ |
+| License | MIT (planned) |
+
+---
+
+### 🚀 Quick Start
+
+#### 1️⃣ Clone the project
+
+```bash
+git clone https://github.com/RickF71/dis-domain-console.git
+cd dis-domain-console
