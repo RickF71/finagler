@@ -10,11 +10,6 @@ export default function Sidebar() {
         <img
           src={finaglerInside}
           alt="Finagler Inside"
-          className="w-20 h-20 bg-transparent opacity-90 hover:opacity-100 transition-opacity duration-500"
-          style={{
-            filter: 'drop-shadow(0 0 8px rgba(72,250,255,0.3))',
-            mixBlendMode: 'normal',
-          }}
         />
         <span className="text-[#7FC692] text-xs mt-3 tracking-wider uppercase">
           Finagler Inside
