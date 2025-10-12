@@ -7,6 +7,17 @@ html, body, #root {
   height: 100%;
   margin: 0;
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  background-color: #0b0f14;
+background-color: #0B0F14;
   color: #e5e7eb;
+}
+:root {
+  --finagler-emerald: #00B97A;
+  --finagler-jade: #2E8C47;
+  --finagler-jade-dark: #177430;
+  --finagler-cobalt: #3B82F6;
+  --finagler-cobalt-deep: #165260;
+  --finagler-mint: #7FC692;
+  --finagler-neutral-dark: #0A0F0D;
+  --finagler-neutral-light: #F7FAF9;
+  --finagler-harmony: #E9A6A6; 
 }
