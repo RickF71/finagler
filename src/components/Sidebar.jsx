@@ -1,43 +1,48 @@
-// src/components/Sidebar.jsx
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import finaglerInsideTrans from '../assets/finagler_inside.trans.png';
+import finaglerInside from '../assets/finagler_inside.trans.png';
 
 export default function Sidebar() {
   return (
-    <aside className="w-60 bg-finagler-nightfieldSolid border-r border-finagler-cobaltDeep flex flex-col items-center py-6">
-      <div className="mb-8 flex flex-col items-center bg-transparent">
+    <aside className="w-60 bg-[#0B0F14] border-r border-[#2A3642] flex flex-col items-center py-8">
+      {/* Finagler Inside Logo */}
+      <div className="mb-10 flex flex-col items-center">
         <img
-          src={finaglerInsideTrans}
+          src={finaglerInside}
           alt="Finagler Inside"
           className="w-20 h-20 bg-transparent opacity-90 hover:opacity-100 transition-opacity duration-500"
-          style={{ filter: 'drop-shadow(0 0 8px rgba(72,250,255,0.3))', mixBlendMode: 'normal' }}
+          style={{
+            filter: 'drop-shadow(0 0 8px rgba(72,250,255,0.3))',
+            mixBlendMode: 'normal',
+          }}
         />
-        <span className="text-[#7FC692] text-sm mt-2 tracking-wide uppercase">
+        <span className="text-[#7FC692] text-xs mt-3 tracking-wider uppercase">
           Finagler Inside
         </span>
       </div>
 
-
-
-      {/* Menu Links */}
-      <nav className="w-full space-y-2 px-4">
+      {/* Navigation */}
+      <nav className="w-full px-4 space-y-2">
         <NavLink
           to="/overview"
           className={({ isActive }) =>
-            `block px-4 py-2 rounded-md text-slate-200 hover:bg-slate-700/40 transition ${
-              isActive ? 'bg-slate-700/60 text-emerald-300' : ''
+            `block px-4 py-2 rounded-md transition ${
+              isActive
+                ? 'bg-[#2A3642] text-[#00B97A]'
+                : 'text-slate-300 hover:bg-[#131A21] hover:text-[#00B97A]'
             }`
           }
         >
-          Node Overview
+          Overview
         </NavLink>
 
         <NavLink
           to="/identities"
           className={({ isActive }) =>
-            `block px-4 py-2 rounded-md text-slate-200 hover:bg-slate-700/40 transition ${
-              isActive ? 'bg-slate-700/60 text-emerald-300' : ''
+            `block px-4 py-2 rounded-md transition ${
+              isActive
+                ? 'bg-[#2A3642] text-[#00B97A]'
+                : 'text-slate-300 hover:bg-[#131A21] hover:text-[#00B97A]'
             }`
           }
         >
@@ -46,14 +51,20 @@ export default function Sidebar() {
 
         <NavLink
           to="/network"
-          className="block px-4 py-2 rounded-md text-slate-200 hover:bg-slate-700/40 transition"
+          className={({ isActive }) =>
+            `block px-4 py-2 rounded-md transition ${
+              isActive
+                ? 'bg-[#2A3642] text-[#00B97A]'
+                : 'text-slate-300 hover:bg-[#131A21] hover:text-[#00B97A]'
+            }`
+          }
         >
-          Network Graph (Soon)
+          Network Graph
         </NavLink>
       </nav>
 
-      {/* Calm footer pulse */}
-      <div className="mt-auto mb-2 text-xs text-slate-500 animate-pulse">
+      {/* Footer version marker */}
+      <div className="mt-auto mb-2 text-xs text-slate-500">
         v0.2 Nightfield
       </div>
     </aside>
