@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
-import { geoPath, geoMercator, select } from "d3";
+import { useEffect, useState, useRef } from "react";
+import { geoPath, geoNaturalEarth1, select, geoArea } from "d3";
 import * as topojson from "topojson-client";
 
 export default function OverlayViewer() {
   const [geojson, setGeojson] = useState(null);
+  const svgRef = useRef();
 
+  // 🧩 Load map data
   useEffect(() => {
     async function loadMap() {
       const res = await fetch(`${import.meta.env.VITE_API_BASE}/api/terra/map?nocache=${Date.now()}`, {
@@ -13,123 +15,105 @@ export default function OverlayViewer() {
       const text = await res.text();
       const data = JSON.parse(text);
 
-      // ✅ auto-detect and convert TopoJSON if needed
+      let features;
       if (data.type === "Topology") {
         const firstKey = Object.keys(data.objects)[0];
-        const converted = topojson.feature(data, data.objects[firstKey]);
-        console.log("Detected TopoJSON → converted to GeoJSON:", firstKey);
-        setGeojson(converted);
+        features = topojson.feature(data, data.objects[firstKey]);
+        console.log("Converted TopoJSON → GeoJSON:", firstKey);
       } else {
-        setGeojson(data);
+        features = data;
+        console.log("Loaded GeoJSON features:", data.features?.length);
       }
+
+      // ✅ Keep normalization in case of stragglers
+      const normalized = {
+        ...features,
+        features: features.features
+          .map(f => normalizeFeature(f))
+          .filter(f => f && f.geometry && f.geometry.coordinates)
+      };
+
+      setGeojson(normalized);
     }
     loadMap();
   }, []);
 
+  // 🧭 Normalize longitudes and clamp latitudes
+  function normalizeFeature(feature) {
+    if (!feature.geometry || !feature.geometry.coordinates) return feature;
+    function fixCoord(coord) {
+      const [lon, lat] = coord;
+      const safeLon = lon > 180 ? lon - 360 : lon < -180 ? lon + 360 : lon;
+      const safeLat = Math.max(-85, Math.min(85, lat));
+      return [safeLon, safeLat];
+    }
+    function recurse(coords) {
+      if (typeof coords[0] === "number") return fixCoord(coords);
+      return coords.map(recurse);
+    }
+    return { ...feature, geometry: { ...feature.geometry, coordinates: recurse(feature.geometry.coordinates) } };
+  }
+
+  // 🗺️ Render map
   useEffect(() => {
     if (!geojson) return;
-    const svg = select("#terra-map");
+    const svg = select(svgRef.current);
     svg.selectAll("*").remove();
 
     const width = 1000;
     const height = 600;
 
-    // --- Projection roughly centered over your region ---
-    const projection = geoMercator()
-      .center([96.3, 27.3])   // [longitude, latitude]
-      .scale(20000)           // zoom in strongly
+    // 🌐 Use Natural Earth projection – no dateline issues
+    const projection = geoNaturalEarth1()
+      .scale(180)
       .translate([width / 2, height / 2]);
 
     const path = geoPath(projection);
 
-    // --- Diagnostic info ---
-    console.log("GeoJSON summary:", geojson.type, geojson.features?.length);
-    if (geojson.features && geojson.features.length > 0) {
-      console.log("First feature example:", geojson.features[0]);
-    } else {
-      console.warn("No features found or not a FeatureCollection");
-    }
+    console.log("🌍 Feature count:", geojson.features.length);
 
-    // --- Draw your coordinate box ---
-    const boxCoords = [
-      [96.19, 27.26],
-      [96.67, 27.34]
-    ];
+    // ---- Stable draw order ----
+    const sorted = [...geojson.features].sort((a, b) => geoArea(a) - geoArea(b));
 
-    // project and log corners
-    const projected = boxCoords.map(c => {
-      const p = projection(c);
-      console.log("Projected", c, "→", p);
-      return p;
-    });
-
-    // draw a red rectangle for those coordinates
-    svg.append("rect")
-      .attr("x", projected[0][0])
-      .attr("y", projected[1][1])
-      .attr("width", projected[1][0] - projected[0][0])
-      .attr("height", projected[0][1] - projected[1][1])
-      .attr("stroke", "red")
-      .attr("fill", "none")
-      .attr("stroke-width", 2);
-
-    // --- Draw the map itself ---
-    svg.selectAll("path")
-      .data(geojson.features || [])
+    svg
+      .selectAll("path.country")
+      .data(sorted)
       .join("path")
+      .attr("class", "country")
       .attr("d", path)
-      .attr("fill", "rgba(0,185,122,0.3)")
+      .attr("fill", "none")
       .attr("stroke", "#00B97A")
-      .attr("stroke-width", 0.4);
+      .attr("stroke-width", 0.6);
 
-    // --- Print bounding box of full GeoJSON for reference ---
-    console.log("GeoJSON bounds:", path.bounds(geojson));
+    // 🟥 Bounding box for reference
+    const [[x0, y0], [x1, y1]] = path.bounds(geojson);
+    svg.append("rect")
+      .attr("x", x0)
+      .attr("y", y0)
+      .attr("width", x1 - x0)
+      .attr("height", y1 - y0)
+      .attr("fill", "none")
+      .attr("stroke", "red")
+      .attr("stroke-width", 1);
 
-    // 🟢 --- Add Projection Probe Overlay ---
-    const probePoints = [
-      [96.19, 27.26],
-      [96.3, 27.3],
-      [96.4, 27.33],
-      [96.5, 27.29],
-      [96.67, 27.34]
-    ];
-
-    const probes = probePoints.map(p => ({
-      lon: p[0],
-      lat: p[1],
-      proj: projection(p)
-    }));
-
-    // Draw small circles at projected locations
+    // 🟢 Probe dots
+    const probePoints = [[0, 0], [10, 0], [0, 10], [10, 10], [20, 0]];
+    const probes = probePoints.map(p => ({ lon: p[0], lat: p[1], proj: projection(p) }));
     svg.selectAll("circle.probe")
       .data(probes)
       .join("circle")
       .attr("class", "probe")
       .attr("cx", d => d.proj[0])
       .attr("cy", d => d.proj[1])
-      .attr("r", 4)
-      .attr("fill", "#00B97A")
-      .attr("stroke", "#0f172a")
-      .attr("stroke-width", 0.8);
+      .attr("r", 3)
+      .attr("fill", "#22c55e");
 
-    // Add labels near each probe
-    svg.selectAll("text.probe-label")
-      .data(probes)
-      .join("text")
-      .attr("class", "probe-label")
-      .attr("x", d => d.proj[0] + 6)
-      .attr("y", d => d.proj[1] - 4)
-      .attr("font-size", "11px")
-      .attr("fill", "#0f172a")
-      .text(d => `${d.lon.toFixed(2)},${d.lat.toFixed(2)}`);
-
-    console.log("Probe projections:", probes);
+    console.log("Rendered bounds:", path.bounds(geojson));
   }, [geojson]);
 
   return (
     <div className="flex justify-center mt-6">
-      <svg id="terra-map" width="1000" height="600" />
+      <svg ref={svgRef} width="1000" height="600" className="border bg-white" />
     </div>
   );
 }
-
