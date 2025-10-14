@@ -5,6 +5,7 @@ import Layout from './Layout';
 import Overview from './views/Overview';
 import Identities from './views/Identities';
 import NetworkGraph from './views/NetworkGraph';
+import TerraView from './views/TerraView';
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
           <Route path="overview" element={<Overview />} />
           <Route path="identities" element={<Identities />} />
           <Route path="network" element={<NetworkGraph />} />
+          <Route path="terra" element={<TerraView />} /> 
         </Route>
       </Routes>
     </BrowserRouter>
