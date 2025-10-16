@@ -6,6 +6,7 @@ import Overview from './views/Overview';
 import Identities from './views/Identities';
 import NetworkGraph from './views/NetworkGraph';
 import TerraView from './views/TerraView';
+import OverlayViewer from './components/OverlayViewer';
 
 export default function App() {
   return (
@@ -17,6 +18,10 @@ export default function App() {
           <Route path="identities" element={<Identities />} />
           <Route path="network" element={<NetworkGraph />} />
           <Route path="terra" element={<TerraView />} /> 
+          <Route path="civic/world" element={<OverlayViewer region="world" />} />
+          <Route path="civic/world/usa" element={<OverlayViewer region="usa_states" />} />
+
+
         </Route>
       </Routes>
     </BrowserRouter>
