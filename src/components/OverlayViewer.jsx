@@ -208,10 +208,21 @@ export default function OverlayViewer({ region: regionProp, domain = "domain.ter
       });
 
     // click -> open domain modal using ISO_A3 code
+    // stop propagation so other listeners or default behaviors don't intercept the first click
     paths.on("click", (event, d) => {
-      const iso = d.properties?.ISO_A3 || d.properties?.iso_a3 || null;
+      try {
+        if (event && event.stopPropagation) event.stopPropagation();
+        if (event && event.preventDefault) event.preventDefault();
+      } catch (e) {
+        // ignore
+      }
+
+      const rawIso = d.properties?.ISO_A3 || d.properties?.iso_a3 || null;
+      if (!rawIso) return;
+      const iso = String(rawIso).toUpperCase();
       console.log("Country clicked:", iso);
-      if (iso) setSelectedCode(iso);
+      // avoid re-setting the same code which can cause unnecessary re-renders
+      setSelectedCode(prev => (prev === iso ? prev : iso));
     });
 
     // 🌐 Overlay layer — only render if geographic
