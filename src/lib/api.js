@@ -25,3 +25,17 @@ export const getStatus = () => request("/api/status");
 export const listIdentities = () => request("/api/identity/list");
 export const registerIdentity = (payload) =>
   request("/api/identity/register", { method: "POST", body: payload });
+
+// Overlay / Terra helpers
+// getOverlay(domain, scope) -> /api/overlay/:domain/:scope
+// getOverlay(overlayId) -> /api/overlay/:overlayId
+export const getOverlay = (domainOrId, scope) => {
+  if (typeof scope !== "undefined") return request(`/api/overlay/${domainOrId}/${scope}`);
+  return request(`/api/overlay/${domainOrId}`);
+};
+
+// getTerraOverlay(region) -> /api/terra/map?region=<region>&nocache=<ts>
+export const getTerraOverlay = (region = "world", nocache = true) => {
+  const q = `?region=${encodeURIComponent(region)}` + (nocache ? `&nocache=${Date.now()}` : "");
+  return request(`/api/terra/map${q}`);
+};
