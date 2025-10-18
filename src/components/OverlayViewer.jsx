@@ -4,6 +4,7 @@ import { geoPath, select, geoArea, geoEquirectangular } from "d3";
 import * as topojson from "topojson-client";
 import * as d3 from "d3";
 import { getOverlay, getTerraOverlay } from "../lib/api.js";
+import iso2to3 from "../lib/iso3166.js";
 import DomainModal from "@/components/DomainModal";
 
 /**
@@ -209,17 +210,7 @@ export default function OverlayViewer({ region: regionProp, domain = "domain.ter
 
     // click -> open domain modal using ISO_A3 code
     // stop propagation so other listeners or default behaviors don't intercept the first click
-    // small map for common 2-letter -> 3-letter ISO mappings used by topojson variants
-    const iso2to3 = {
-      US: "USA",
-      CA: "CAN",
-      MX: "MEX",
-      GB: "GBR",
-      FR: "FRA",
-      DE: "DEU",
-      JP: "JPN",
-      AU: "AUS",
-    };
+    // use canonical mapping file for ISO-2 -> ISO-3
 
     paths.on("click", (event, d) => {
       try {
