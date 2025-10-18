@@ -3,6 +3,8 @@ import { useLocation } from "react-router-dom";
 import { geoPath, select, geoArea, geoEquirectangular } from "d3";
 import * as topojson from "topojson-client";
 import * as d3 from "d3";
+import { getOverlay, getTerraOverlay } from "../lib/api.js";
+import DomainModal from "@/components/DomainModal";
 
 /**
  * OverlayViewer
@@ -13,6 +15,7 @@ export default function OverlayViewer({ region: regionProp, domain = "domain.ter
   const [overlay, setOverlay] = useState(null);
   const [showOverlay, setShowOverlay] = useState(true);
   const [scope, setScope] = useState("authority");
+  const [selectedCode, setSelectedCode] = useState(null);
   const svgRef = useRef();
   const location = useLocation();
 
@@ -27,24 +30,27 @@ export default function OverlayViewer({ region: regionProp, domain = "domain.ter
   // 🧩 Load Terra map
   useEffect(() => {
     async function loadMap() {
-      const url = `${import.meta.env.VITE_API_BASE}/api/terra/map?region=${region}&nocache=${Date.now()}`;
-      console.log(`🗺️ Loading region: ${region}`);
-      const res = await fetch(url, { cache: "no-store" });
-      const data = await res.json();
+      try {
+        console.log(`🗺️ Loading region: ${region}`);
+        const data = await getTerraOverlay(region);
 
-      let features;
-      if (data.type === "Topology") {
-        const firstKey = Object.keys(data.objects)[0];
-        features = topojson.feature(data, data.objects[firstKey]);
-      } else features = data;
+        let features;
+        if (data.type === "Topology") {
+          const firstKey = Object.keys(data.objects)[0];
+          features = topojson.feature(data, data.objects[firstKey]);
+        } else features = data;
 
-      const normalized = {
-        ...features,
-        features: features.features
-          .map(f => normalizeFeature(f))
-          .filter(f => f && f.geometry && f.geometry.coordinates),
-      };
-      setGeojson(normalized);
+        const normalized = {
+          ...features,
+          features: features.features
+            .map(f => normalizeFeature(f))
+            .filter(f => f && f.geometry && f.geometry.coordinates),
+        };
+        setGeojson(normalized);
+      } catch (err) {
+        console.error("Load map failed:", err);
+        setGeojson(null);
+      }
     }
     loadMap();
   }, [region]);
@@ -69,12 +75,9 @@ export default function OverlayViewer({ region: regionProp, domain = "domain.ter
   useEffect(() => {
     async function loadOverlay() {
       try {
-        const url = `${import.meta.env.VITE_API_BASE}/api/overlay/${domain}/${scope}`;
         console.log(`🔍 Loading overlay: ${domain}/${scope}`);
-        const res = await fetch(url, { cache: "no-store" });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        setOverlay(data.data);
+        const data = await getOverlay(domain, scope);
+        setOverlay(data.data || data);
       } catch (err) {
         console.error("Overlay fetch failed:", err);
         setOverlay(null);
@@ -90,24 +93,24 @@ export default function OverlayViewer({ region: regionProp, domain = "domain.ter
     svg.selectAll("*").remove();
 
     const width = 1000;
-    const height = 600;
+    const height = 500;
+
+    // 🌍 Fit full globe, no gaps
     const projection = geoEquirectangular()
-      .rotate([-25, 0])
-      .fitExtent([[40, 0], [width - 40, height]], geojson);
+      .fitExtent([[0, 0], [width, height]], { type: "Sphere" });
 
-    const path = geoPath(projection);
+    const path = d3.geoPath(projection);
 
-    // Base layer
+    // Base background
     svg.append("rect")
       .attr("width", width)
       .attr("height", height)
       .attr("fill", "#A9C9C2");
 
-    // 🗺️ Create zoomable group
+    // 🗺️ Map layer
     const mapGroup = svg.append("g").attr("class", "map-layer");
 
     const sorted = [...geojson.features].sort((a, b) => geoArea(a) - geoArea(b));
-
     const paths = mapGroup
       .selectAll("path.feature")
       .data(sorted)
@@ -118,15 +121,20 @@ export default function OverlayViewer({ region: regionProp, domain = "domain.ter
       .attr("stroke-width", region === "world" ? 0.6 : 0.8)
       .attr("pointer-events", "all");
 
-    // ✨ Shadow filter for hover “pop”
+    // ✨ Drop shadow filter
     const defs = svg.append("defs");
     const filter = defs.append("filter")
       .attr("id", "glow")
-      .attr("x", "-50%").attr("y", "-50%")
-      .attr("width", "200%").attr("height", "200%");
+      .attr("x", "-50%")
+      .attr("y", "-50%")
+      .attr("width", "200%")
+      .attr("height", "200%");
     filter.append("feDropShadow")
-      .attr("dx", 0).attr("dy", 1).attr("stdDeviation", 2)
-      .attr("flood-color", "#000000").attr("flood-opacity", 0.35);
+      .attr("dx", 0)
+      .attr("dy", 1)
+      .attr("stdDeviation", 2)
+      .attr("flood-color", "#000000")
+      .attr("flood-opacity", 0.35);
 
     // 🪶 Tooltip
     const container = select(svgRef.current.parentNode);
@@ -146,14 +154,17 @@ export default function OverlayViewer({ region: regionProp, domain = "domain.ter
         .style("z-index", 50);
     }
 
-    // 🧭 Hover + tooltip (fixed positioning)
+    // 🧭 Tooltip offset (screen-space positioning)
+    const TOOLTIP_OFFSET_X = 285;  // distance right of cursor
+    const TOOLTIP_OFFSET_Y = 15;   // distance below cursor
+
+    // 🧭 Hover + tooltip
     paths
       .on("mousemove", function (event, d) {
         const props = d.properties || {};
         const name = props.ADMIN || props.name || "Unknown";
         const iso = props.ISO_A3 || "";
         const pop = props.POP_EST ? props.POP_EST.toLocaleString() : "N/A";
-        const gdp = props.GDP_MD_EST ? `$${props.GDP_MD_EST.toLocaleString()}M` : "N/A";
         const continent = props.CONTINENT || "Unknown";
         const subregion = props.SUBREGION || "Unknown";
 
@@ -162,11 +173,20 @@ export default function OverlayViewer({ region: regionProp, domain = "domain.ter
           .attr("fill", "#8FAE9A")
           .attr("filter", "url(#glow)");
 
-        // Tooltip position based on true mouse location in screen space
-        const { clientX, clientY } = event;
+        const rect = svgRef.current.getBoundingClientRect();
+
+        // Ensure CSS variables exist (only needed once)
+        document.documentElement.style.setProperty("--tooltip-offset-x", 285);
+        document.documentElement.style.setProperty("--tooltip-offset-y", 15);
+        const computed = getComputedStyle(document.documentElement);
+        const offsetX = parseFloat(computed.getPropertyValue("--tooltip-offset-x")) || TOOLTIP_OFFSET_X;
+        const offsetY = parseFloat(computed.getPropertyValue("--tooltip-offset-y")) || TOOLTIP_OFFSET_Y;
+        const x = event.clientX - rect.left + offsetX;
+        const y = event.clientY - rect.top + offsetY;
+
         tooltip
-          .style("left", `${clientX + 15}px`)
-          .style("top", `${clientY - 20}px`)
+          .style("left", `${x}px`)
+          .style("top", `${y}px`)
           .style("opacity", 1)
           .html(`
             <div style="background:#00B97A;color:#0B0F14;padding:4px 8px;font-weight:bold;font-size:0.85rem;border-top-left-radius:10px;border-top-right-radius:10px;">
@@ -181,33 +201,47 @@ export default function OverlayViewer({ region: regionProp, domain = "domain.ter
       })
       .on("mouseleave", function () {
         d3.select(this).attr("fill", "#5E7466").attr("filter", null);
-        tooltip.style("opacity", 0);
+        tooltip
+          .interrupt()
+          .transition().duration(0)
+          .style("opacity", 0);
       });
 
-    // 🌐 Overlay layer
-    if (showOverlay && overlay?.nodes && overlay?.edges) {
-      const nodeScale = d3.scaleLinear().domain([0, overlay.nodes.length]).range([100, width - 100]);
-      const centerY = height - 80;
+    // click -> open domain modal using ISO_A3 code
+    paths.on("click", (event, d) => {
+      const iso = d.properties?.ISO_A3 || d.properties?.iso_a3 || null;
+      console.log("Country clicked:", iso);
+      if (iso) setSelectedCode(iso);
+    });
 
+    // 🌐 Overlay layer — only render if geographic
+    if (
+      showOverlay &&
+      overlay?.nodes?.length &&
+      overlay.nodes[0]?.lat !== undefined &&
+      overlay.nodes[0]?.lon !== undefined
+    ) {
+      // Draw edges
       mapGroup.selectAll("line.overlay-edge")
         .data(overlay.edges)
         .join("line")
         .attr("class", "overlay-edge")
-        .attr("x1", d => nodeScale(overlay.nodes.findIndex(n => n.id === d.from)))
-        .attr("x2", d => nodeScale(overlay.nodes.findIndex(n => n.id === d.to)))
-        .attr("y1", centerY)
-        .attr("y2", centerY)
+        .attr("x1", d => projection([overlay.nodes.find(n => n.id === d.from).lon, overlay.nodes.find(n => n.id === d.from).lat])[0])
+        .attr("y1", d => projection([overlay.nodes.find(n => n.id === d.from).lon, overlay.nodes.find(n => n.id === d.from).lat])[1])
+        .attr("x2", d => projection([overlay.nodes.find(n => n.id === d.to).lon, overlay.nodes.find(n => n.id === d.to).lat])[0])
+        .attr("y2", d => projection([overlay.nodes.find(n => n.id === d.to).lon, overlay.nodes.find(n => n.id === d.to).lat])[1])
         .attr("stroke", "#22c55e")
         .attr("stroke-width", 2)
         .attr("opacity", 0.7);
 
+      // Draw nodes
       mapGroup.selectAll("circle.overlay-node")
         .data(overlay.nodes)
         .join("circle")
         .attr("class", "overlay-node")
-        .attr("cx", (_, i) => nodeScale(i))
-        .attr("cy", centerY)
-        .attr("r", 8)
+        .attr("cx", d => projection([d.lon, d.lat])[0])
+        .attr("cy", d => projection([d.lon, d.lat])[1])
+        .attr("r", 6)
         .attr("fill", "#00B97A")
         .attr("stroke", "#0B0F14")
         .attr("stroke-width", 1.6)
@@ -215,22 +249,48 @@ export default function OverlayViewer({ region: regionProp, domain = "domain.ter
         .text(d => `${d.label} (${d.id})`);
     }
 
-    // 🧭 Zoom behavior
+    // 🧭 Proper zoom/pan with mouse-centered zoom and edge clamping
+    const [[x0, y0], [x1, y1]] = path.bounds({ type: "Sphere" });
     const zoom = d3.zoom()
       .scaleExtent([1, 8])
       .on("zoom", (event) => {
-        mapGroup.attr("transform", event.transform);
+        const { transform } = event;
+        mapGroup.attr("transform", transform);
+
+        const k = transform.k;
+        const dx = (x1 - x0) * k;
+        const dy = (y1 - y0) * k;
+
+        const minX = Math.min(0, width - dx);
+        const minY = Math.min(0, height - dy);
+        const maxX = 0;
+        const maxY = 0;
+
+        const clampedX = Math.max(minX, Math.min(transform.x, maxX));
+        const clampedY = Math.max(minY, Math.min(transform.y, maxY));
+
+        if (clampedX !== transform.x || clampedY !== transform.y) {
+          svg.transition().duration(0)
+            .call(zoom.transform, d3.zoomIdentity.translate(clampedX, clampedY).scale(k));
+        }
       });
 
-    svg.call(zoom);
+    svg.call(zoom).call(zoom.transform, d3.zoomIdentity);
+
+    // Double-click reset
+    svg.on("dblclick.zoom", null);
+    svg.on("dblclick", () => {
+      svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity);
+    });
 
     return () => d3.selectAll(".map-tooltip").remove();
   }, [geojson, overlay, region, showOverlay]);
 
   // 🧭 UI
   return (
+    <>
     <div className="flex justify-center mt-6 relative">
-      <svg ref={svgRef} width="1000" height="600" className="border shadow-md rounded bg-[#A9C9C2]" />
+      <svg ref={svgRef} width="1000" height="500" className="border shadow-md rounded bg-[#A9C9C2]" />
       <div className="absolute top-4 right-6 flex gap-2">
         <select
           value={scope}
@@ -251,5 +311,11 @@ export default function OverlayViewer({ region: regionProp, domain = "domain.ter
         </button>
       </div>
     </div>
+    {selectedCode && (
+      <div className="absolute inset-0 flex items-center justify-center z-[1000]">
+        <DomainModal code={selectedCode} onClose={() => setSelectedCode(null)} />
+      </div>
+    )}
+    </>
   );
 }
