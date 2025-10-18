@@ -209,6 +209,18 @@ export default function OverlayViewer({ region: regionProp, domain = "domain.ter
 
     // click -> open domain modal using ISO_A3 code
     // stop propagation so other listeners or default behaviors don't intercept the first click
+    // small map for common 2-letter -> 3-letter ISO mappings used by topojson variants
+    const iso2to3 = {
+      US: "USA",
+      CA: "CAN",
+      MX: "MEX",
+      GB: "GBR",
+      FR: "FRA",
+      DE: "DEU",
+      JP: "JPN",
+      AU: "AUS",
+    };
+
     paths.on("click", (event, d) => {
       try {
         if (event && event.stopPropagation) event.stopPropagation();
@@ -217,10 +229,14 @@ export default function OverlayViewer({ region: regionProp, domain = "domain.ter
         // ignore
       }
 
-      const rawIso = d.properties?.ISO_A3 || d.properties?.iso_a3 || null;
+      const rawIso = d.properties?.ISO_A3 || d.properties?.ISO_A2 || d.properties?.iso_a3 || d.properties?.iso_a2 || null;
       if (!rawIso) return;
-      const iso = String(rawIso).toUpperCase();
-      console.log("Country clicked:", iso);
+      const candidate = String(rawIso).toUpperCase();
+      let iso = candidate;
+      if (candidate.length === 2 && iso2to3[candidate]) {
+        iso = iso2to3[candidate];
+      }
+      console.log("Country clicked raw:", candidate, "mapped:", iso);
       // avoid re-setting the same code which can cause unnecessary re-renders
       setSelectedCode(prev => (prev === iso ? prev : iso));
     });
