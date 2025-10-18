@@ -12,11 +12,11 @@ export default function DomainModal({ code, onClose }) {
 
     (async () => {
       try {
-        const res = await fetch(`/api/domain/info?code=${code}`);
+        // Ensure this hits the backend API (not the Vite dev server proxy)
+        const url = `http://localhost:8080/api/domain/info?code=${encodeURIComponent(code)}`;
+        const res = await fetch(url);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const text = await res.text();
-        console.log("Domain info raw response:", text);
-        const parsed = JSON.parse(text);
+        const parsed = await res.json();
         setDomain(parsed);
       } catch (err) {
         setError(err.message);
