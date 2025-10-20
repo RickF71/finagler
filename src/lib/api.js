@@ -1,3 +1,7 @@
+// MirrorSpin status
+export const fetchMirrorSpinStatus = () => request("/api/mirrorspin/status");
+// Network peers
+export const listPeers = () => request("/api/net/peers");
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8080";
 
 async function request(path, { method = "GET", body, headers } = {}) {

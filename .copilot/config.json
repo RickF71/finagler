@@ -1,0 +1,43 @@
+{
+  "project_name": "Finagler",
+  "description": "Finagler — the DIS Domain Console. A React + Tailwind + D3 interface for managing Terra, Limen, and domain relationships within the Direct Individual Sovereignty (DIS) ecosystem.",
+  "preferred_language": "javascript",
+  "context_directories": [
+    "src",
+    "components",
+    "hooks",
+    "lib",
+    "assets",
+    "../dis-core/internal",
+    "../dis-core/domains",
+    "../dis-core/schemas"
+  ],
+  "tags": [
+    "finagler",
+    "nightfield",
+    "finagler-emerald",
+    "react",
+    "tailwind",
+    "d3",
+    "dis-core",
+    "terra",
+    "consent-ledger",
+    "overlayviewer"
+  ],
+  "guidance": {
+    "ui_style": "Dark mode by default (Nightfield gradient). Rounded corners, soft shadows, emerald highlights. Motion is subtle and purpose-driven.",
+    "coding_style": "Functional React with hooks, prefer composition over inheritance. Use Tailwind classes and shadcn/ui components.",
+    "visual_language": "Finagler Emerald (#00C49A), Jade (#009E73), Cobalt (#0066CC), Nightfield background (#0A0F1A). Avoid harsh contrast.",
+    "data_viz": "Use D3 and Recharts; animate transitions with Framer Motion. Keep overlays intuitive and domain-linked.",
+    "imports": {
+      "core_api": "import { api } from '@/lib/api'",
+      "overlay": "import OverlayViewer from '@/components/OverlayViewer'",
+      "domain_utils": "import { resolveDomainPath } from '@/lib/domainUtils'"
+    },
+    "integration": {
+      "backend": "Reads DIS schemas from ../dis-core/domains and ../dis-core/schemas for validation and autocomplete.",
+      "api_contracts": "Aligns with Go structs in ../dis-core/internal/types"
+    },
+    "prompt_tone": "Assist like a calm UI engineer who understands that design is a form of governance. Speak in terms of clarity, consent, and visibility."
+  }
+}

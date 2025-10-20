@@ -1,21 +1,34 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import iso2to3 from "../lib/iso3166.js";
+import iso3toName from "../lib/iso3166_name.js";
 
 export default function DomainModal({ code, onClose }) {
   const [domain, setDomain] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const lastQuery = useRef("");
 
   useEffect(() => {
     if (!code) return;
     setLoading(true);
     setError(null);
+    lastQuery.current = code;
 
     (async () => {
       try {
-        // Ensure this hits the backend API (not the Vite dev server proxy)
         const url = `http://localhost:8080/api/domain/info?code=${encodeURIComponent(code)}`;
         const res = await fetch(url);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        if (!res.ok) {
+          let msg = `HTTP ${res.status}`;
+          // Try to parse error JSON for 404
+          try {
+            const errJson = await res.json();
+            if (res.status === 404 && errJson && errJson.error) {
+              msg = `404 Not Found: ${errJson.error}`;
+            }
+          } catch {}
+          throw new Error(msg);
+        }
         const parsed = await res.json();
         setDomain(parsed);
       } catch (err) {
@@ -26,20 +39,59 @@ export default function DomainModal({ code, onClose }) {
     })();
   }, [code]);
 
+  // Close on ESC or backdrop click
+  useEffect(() => {
+    function handleKey(e) {
+      if (e.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [onClose]);
+
   if (!code) return null;
 
+  // Backdrop click closes modal
+  function handleBackdrop(e) {
+    if (e.target === e.currentTarget) onClose();
+  }
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm"
+      onClick={handleBackdrop}
+      tabIndex={-1}
+      aria-modal="true"
+      role="dialog"
+    >
       <div className="bg-[#0B0F14] text-slate-200 p-6 rounded-2xl w-[90%] max-w-md shadow-lg border border-slate-700 relative">
         <button
           onClick={onClose}
           className="absolute top-2 right-3 text-slate-400 hover:text-slate-200 text-xl"
+          aria-label="Close"
         >
           ×
         </button>
 
         {loading && <p className="text-sm text-slate-400 animate-pulse">Loading {code}…</p>}
-        {error && <p className="text-sm text-rose-400">Error: {error}</p>}
+        {error && error.includes("404") ? (
+          <div className="text-center py-6">
+            <h2 className="text-2xl font-semibold text-[#7FC692] mb-2">
+              {(() => {
+                let code = lastQuery.current;
+                if (code === "-99") code = "FRA";
+                let iso3 = code;
+                if (code.length === 2 && iso2to3[code]) iso3 = iso2to3[code];
+                const name = iso3toName[iso3];
+                if (name) return `${name} (${iso3})`;
+                // fallback: just show ISO3
+                return iso3;
+              })()}
+            </h2>
+            <div className="text-lg text-slate-400 mt-2">NO DATA</div>
+          </div>
+        ) : error ? (
+          <div className="text-sm text-rose-400">Error: {error}</div>
+        ) : null}
 
         {domain && (
           <div className="animate-fade-in">
