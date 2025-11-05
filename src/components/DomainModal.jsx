@@ -57,13 +57,13 @@ export default function DomainModal({ code, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm"
+      className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm"
       onClick={handleBackdrop}
       tabIndex={-1}
       aria-modal="true"
       role="dialog"
     >
-      <div className="bg-[#0B0F14] text-slate-200 p-6 rounded-2xl w-[90%] max-w-md shadow-lg border border-slate-700 relative">
+      <div className=" text-slate-200 p-6 rounded-2xl w-[90%] max-w-md shadow-lg border border-slate-700 relative">
         <button
           onClick={onClose}
           className="absolute top-2 right-3 text-slate-400 hover:text-slate-200 text-xl"

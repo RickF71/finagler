@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 //import { motion } from 'framer-motion';
-import { Card } from '@/components/ui/card';
+import { Card } from '@/components/ui/Card';
 
 export default function NetworkGraph() {
   const canvasRef = useRef(null);

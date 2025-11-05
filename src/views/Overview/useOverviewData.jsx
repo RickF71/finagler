@@ -41,6 +41,7 @@ export function useOverviewData() {
       if (!mounted) return
       setLastLatency(latency)
 
+      
       const dur = mapRange(latency, 50, 1200, 1.6, 0.8)
       const base = mapRange(latency, 50, 1200, 1.0, 1.06)
 

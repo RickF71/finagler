@@ -86,6 +86,21 @@ export default function OverlayViewer({ region: regionProp, domain = "domain.ter
     loadOverlay();
   }, [domain, scope]);
 
+  useEffect(() => {
+  const es = new EventSource("/api/events/live");
+  es.addEventListener("domain.update", (e) => {
+    const ev = JSON.parse(e.data);
+    const payload = JSON.parse(ev.payload);
+    if (payload.domain === "domain.usa") {
+      setMapColor(
+        payload.state === "domain.freeze.v1" ? "#ff4444" :
+        payload.state === "domain.unfreeze.v1" ? "#44ff44" : "#00b97a"
+      );
+    }
+  });
+  return () => es.close();
+}, []);
+
   // Draw map (no zoom/pan)
   useEffect(() => {
     if (!geojson) return;

@@ -46,4 +46,23 @@ export default function NodeStatus() {
       )}
     </div>
   );
+
+
 }
+
+
+  useEffect(() => {
+    async function loadDIS() {
+      const res = await fetch("/api/domain/dis/domain.user.rick");
+      const { css, jsx } = await res.json();
+      if (css) {
+        const style = document.createElement("style");
+        style.innerHTML = css;
+        document.head.appendChild(style);
+      }
+      if (jsx) {
+        document.getElementById("root").innerHTML = jsx;
+      }
+    }
+    loadDIS();
+  }, []);
