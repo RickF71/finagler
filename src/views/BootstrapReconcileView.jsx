@@ -105,39 +105,40 @@ export default function BootstrapReconcileView() {
 
   if (loading)
     return (
-      <div className="flex items-center justify-center h-full text-gray-400">
-        <Loader2 className="animate-spin mr-2" /> Loading YAML...
+      <div className="center pad-md text-muted">
+        <Loader2 style={{ marginRight: '8px' }} /> Loading YAML...
       </div>
     );
   if (error)
     return (
-      <div className="flex items-center justify-center h-full text-red-500">
-        <XCircle className="mr-2" /> {error}
+      <div className="center pad-md warning">
+        <XCircle style={{ marginRight: '8px' }} /> {error}
       </div>
     );
 
   return (
-    <div className="flex flex-col h-full p-6 space-y-4">
+    <div className="panel column gap-md pad-md" style={{ height: '100%' }}>
       {toast && <Toast type={toast.type} message={toast.msg} />}
 
-      <div className="flex flex-1 gap-4">
+      <div className="flex gap-md" style={{ flex: '1' }}>
         {/* LEFT PANEL */}
-        <Card className="w-1/3 bg-[#10161C] border-[#2A3642]">
+        <Card className="panel" style={{ width: '33.333%' }}>
           <CardHeader>
-            <h2 className="text-lg font-semibold text-[#00B97A]">
+            <h2 style={{ fontSize: '1.125rem', fontWeight: '600' }}>
               YAML Mapping
             </h2>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="column gap-md">
             {/* detection banner */}
             <div
-              className={`text-sm font-semibold px-3 py-2 rounded-md ${
+              className={`pad-sm ${
                 detectedType === "schema"
                   ? "bg-[#003322] text-[#00B97A]"
                   : detectedType === "domain"
                   ? "bg-[#331a00] text-[#ffae42]"
                   : "bg-[#222] text-gray-400"
               }`}
+              style={{ fontSize: '0.875rem', fontWeight: '600', borderRadius: '6px' }}
             >
               {detectedType === "schema"
                 ? "Schema detected"
@@ -203,25 +204,27 @@ export default function BootstrapReconcileView() {
                     setToast({ type: "error", msg: `Canonize failed: ${err.message}` })
                   );
               }}
-              className="w-full bg-yellow-600 hover:bg-yellow-500 text-black"
+              className="button"
+              style={{ width: '100%', backgroundColor: '#d97706', color: 'black' }}
             >
-              <CheckCircle2 className="mr-2 h-4 w-4" /> Canonize
+              <CheckCircle2 style={{ marginRight: '8px', width: '16px', height: '16px' }} /> Canonize
             </Button>
 
 
             <Button
               onClick={handleValidate}
-              className="w-full bg-[#00B97A] text-black hover:bg-[#00e697]"
+              className="button"
+              style={{ width: '100%', backgroundColor: '#00B97A', color: 'black' }}
             >
-              <CheckCircle2 className="mr-2 h-4 w-4" /> Validate
+              <CheckCircle2 style={{ marginRight: '8px', width: '16px', height: '16px' }} /> Validate
             </Button>
           </CardContent>
         </Card>
 
         {/* RIGHT PANEL */}
-        <Card className="flex-1 bg-[#0B0F14] border-[#2A3642]">
+        <Card className="panel" style={{ flex: '1' }}>
           <CardHeader>
-            <h2 className="text-lg font-semibold text-[#00B97A]">
+            <h2 style={{ fontSize: '1.125rem', fontWeight: '600' }}>
               {detectedType === "schema"
                 ? "Schema Canon YAML"
                 : detectedType === "domain"
@@ -229,11 +232,11 @@ export default function BootstrapReconcileView() {
                 : "Raw YAML Preview"}
             </h2>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="column gap-md">
             {/* additions preview */}
-            <div className="border border-[#2A3642] rounded-md bg-[#10161C] p-3 text-gray-300 text-sm">
-              <p className="text-[#00B97A] font-semibold mb-1">New DIS Additions</p>
-              <pre className="whitespace-pre-wrap">
+            <div className="panel pad-sm" style={{ fontSize: '0.875rem' }}>
+              <p style={{ fontWeight: '600', marginBottom: '4px' }}>New DIS Additions</p>
+              <pre style={{ whiteSpace: 'pre-wrap' }}>
                 {detectedType === "schema"
                   ? `meta:
   schema_id: ${form.schema_id || "<unset>"}
@@ -247,7 +250,7 @@ export default function BootstrapReconcileView() {
             </div>
 
             {/* raw YAML */}
-            <pre className="text-gray-300 bg-[#0B0F14] border border-[#2A3642] p-3 rounded-md overflow-auto text-sm h-[60vh] whitespace-pre-wrap">
+            <pre className="panel text-muted pad-sm" style={{ fontSize: '0.875rem', height: '60vh', overflow: 'auto', whiteSpace: 'pre-wrap' }}>
               {formatForDisplay(data?.content)}
             </pre>
           </CardContent>
@@ -255,7 +258,7 @@ export default function BootstrapReconcileView() {
       </div>
 
       {/* BOTTOM BAR */}
-      <div className="flex justify-end gap-4 border-t border-[#2A3642] pt-4">
+      <div className="toolbar" style={{ justifyContent: 'flex-end' }}>
         <Button
           variant="secondary"
           onClick={() =>
@@ -273,9 +276,10 @@ export default function BootstrapReconcileView() {
         </Button>
         <Button
           onClick={handleSave}
-          className="bg-[#00B97A] text-black hover:bg-[#00e697]"
+          className="button"
+          style={{ backgroundColor: '#00B97A', color: 'black' }}
         >
-          <Save className="mr-2 h-4 w-4" /> Save Bootstrap
+          <Save style={{ marginRight: '8px', width: '16px', height: '16px' }} /> Save Bootstrap
         </Button>
       </div>
     </div>
@@ -285,13 +289,14 @@ export default function BootstrapReconcileView() {
 /* Input helper */
 function Field({ label, value, onChange, placeholder }) {
   return (
-    <div>
-      <label className="text-gray-400 text-sm block mb-1">{label}</label>
+    <div className="field">
+      <label className="text-muted" style={{ fontSize: '0.875rem', display: 'block', marginBottom: '4px' }}>{label}</label>
       <input
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-[#0B0F14] border border-[#2A3642] rounded-md p-2 text-gray-100"
+        className="field"
+        style={{ width: '100%' }}
         placeholder={placeholder}
       />
     </div>

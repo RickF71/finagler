@@ -3,8 +3,8 @@ import OverlayViewer from "../components/OverlayViewer";
 
 export default function TerraView() {
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-semibold mb-4 text-center">
+    <div className="pad-md">
+      <h1 className="center pad-md" style={{ fontSize: '1.25rem', fontWeight: '600' }}>
         🌍 DIS Terra Overlay
       </h1>
       <OverlayViewer />

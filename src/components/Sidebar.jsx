@@ -30,47 +30,44 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="w-64 bg-slate-950 text-slate-100 flex flex-col border-r border-slate-800 transition-all duration-300">
+    <aside className="sidebar">
       {/* Finagler Logo + Spinner */}
-      <div className="flex items-center justify-center p-4 border-b border-slate-800 relative">
+      <div className="toolbar flex center pad-md">
         <img
           src={finaglerIcon}
           alt="Finagler"
-          className="w-full h-auto object-contain drop-shadow-[0_0_15px_rgba(16,255,128,0.3)]"
+          style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
         />
         {domainLoading && (
           <Loader2
-            className="absolute bottom-2 right-2 text-emerald-400 animate-spin"
+            style={{ position: 'absolute', bottom: '8px', right: '8px' }}
             size={16}
           />
         )}
       </div>
 
       {/* Domain Name under graphic */}
-      <div className="px-4 py-2 border-b border-slate-800 text-center">
+      <div className="toolbar center">
         {domainError ? (
-          <span className="text-red-400 text-sm">{domainError}</span>
+          <span className="warning">{domainError}</span>
         ) : (
           <>
-            <h2 className="text-amber-400 font-semibold text-sm">
+            <h2 style={{ fontSize: '0.875rem', fontWeight: '600' }}>
               {domain?.name || activeDomainId || "Unknown Domain"}
             </h2>
-            <p className="text-xs text-slate-500 mt-1">Active Domain</p>
+            <p className="text-muted" style={{ fontSize: '0.75rem', marginTop: '4px' }}>Active Domain</p>
           </>
         )}
       </div>
 
       {/* Navigation Menu */}
-      <nav className="flex-1 overflow-y-auto">
+      <nav className="column" style={{ flex: '1', overflowY: 'auto' }}>
         {menuItems.map(({ label, view: v }) => (
           <div
             key={v}
             onClick={() => setView(v)}
-            className={`px-4 py-2 cursor-pointer transition-all duration-150 ${
-              view === v
-                ? "bg-slate-800 text-emerald-400"
-                : "text-slate-300 hover:bg-slate-900 hover:text-white"
-            }`}
+            className={`pad-md ${view === v ? 'selected' : ''}`}
+            style={{ cursor: 'pointer' }}
           >
             {label}
           </div>
@@ -78,10 +75,11 @@ export default function Sidebar() {
       </nav>
 
       {/* Return to Domain Chooser */}
-      <div className="p-4 border-t border-slate-800">
+      <div className="toolbar">
         <button
           onClick={() => setActiveDomainId(NONE_DOMAIN_ID)}
-          className="w-full px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-md text-sm font-medium transition-colors"
+          className="button"
+          style={{ width: '100%' }}
         >
           Return to Domain Chooser
         </button>

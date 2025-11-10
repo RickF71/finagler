@@ -13,15 +13,16 @@ export default function Dropdown({ label, items = [] }) {
   }, []);
 
   return (
-    <div className="relative inline-block text-left" ref={ref}>
+    <div style={{ position: 'relative', display: 'inline-block', textAlign: 'left' }} ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className="px-3 py-2 bg-[#0E1319] border border-[#2A3642] rounded-md text-gray-200 hover:text-white text-sm"
+        className="field"
+        style={{ fontSize: '0.875rem' }}
       >
         {label}
       </button>
       {open && (
-        <div className="absolute mt-2 w-48 bg-[#111820] border border-[#2A3642] rounded-md shadow-lg z-10">
+        <div className="panel" style={{ position: 'absolute', marginTop: '8px', width: '192px', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)', zIndex: '10' }}>
           {items.map((item, idx) => (
             <button
               key={idx}
@@ -29,7 +30,8 @@ export default function Dropdown({ label, items = [] }) {
                 item.onClick?.();
                 setOpen(false);
               }}
-              className="block w-full text-left px-4 py-2 text-gray-200 hover:bg-[#1A242E] text-sm"
+              className="list-item"
+              style={{ display: 'block', width: '100%', textAlign: 'left', fontSize: '0.875rem' }}
             >
               {item.label}
             </button>

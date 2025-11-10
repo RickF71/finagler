@@ -266,18 +266,19 @@ export default function OverlayViewer({ region: regionProp, domain = "domain.ter
   // UI
   return (
     <>
-      <div className="flex justify-center mt-6 relative">
+      <div className="center" style={{ marginTop: '24px', position: 'relative' }}>
         <svg
           ref={svgRef}
           width={width}
           height={height}
-          className="border shadow-md rounded bg-[#A9C9C2]"
+          style={{ border: '1px solid #ccc', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', borderRadius: '8px', backgroundColor: '#A9C9C2' }}
         />
-        <div className="absolute top-4 right-6 flex gap-2">
+        <div className="toolbar gap-sm" style={{ position: 'absolute', top: '16px', right: '24px' }}>
           <select
             value={scope}
             onChange={e => setScope(e.target.value)}
-            className="bg-[#0B0F14] text-[#00B97A] border border-[#00B97A] rounded-xl px-2 py-1 text-sm shadow-lg focus:outline-none"
+            className="field"
+            style={{ fontSize: '0.875rem', borderRadius: '12px', padding: '4px 8px', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
           >
             <option value="authority">Authority</option>
             <option value="trust">Trust</option>
@@ -287,7 +288,8 @@ export default function OverlayViewer({ region: regionProp, domain = "domain.ter
 
           <button
             onClick={() => setShowOverlay(!showOverlay)}
-            className="bg-[#0B0F14] text-[#00B97A] border border-[#00B97A] hover:bg-[#00B97A] hover:text-[#0B0F14] transition-all rounded-xl px-3 py-1 text-sm shadow-lg"
+            className="button"
+            style={{ fontSize: '0.875rem', borderRadius: '12px', padding: '4px 12px', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)', transition: 'all 0.2s' }}
           >
             {showOverlay ? "Hide Overlay" : "Show Overlay"}
           </button>
@@ -295,7 +297,7 @@ export default function OverlayViewer({ region: regionProp, domain = "domain.ter
       </div>
 
       {selectedCode && (
-        <div className="absolute inset-0 flex items-center justify-center z-[1000]">
+        <div className="center" style={{ position: 'absolute', inset: '0', zIndex: '1000' }}>
           <DomainModal code={selectedCode} onClose={() => setSelectedCode(null)} />
         </div>
       )}

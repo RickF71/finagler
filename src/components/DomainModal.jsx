@@ -50,24 +50,26 @@ export default function DomainModal({ code, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm"
+      className="center"
+      style={{ position: 'fixed', inset: '0', backgroundColor: 'rgba(0,0,0,0.5)', zIndex: '50', backdropFilter: 'blur(4px)' }}
       onClick={handleBackdrop}
       tabIndex={-1}
       aria-modal="true"
       role="dialog"
     >
-      <div className=" text-slate-200 p-6 rounded-2xl w-[90%] max-w-md shadow-lg border border-slate-700 relative">
+      <div className="panel pad-md" style={{ width: '90%', maxWidth: '28rem', borderRadius: '16px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', position: 'relative' }}>
         <button
           onClick={onClose}
-          className="absolute top-2 right-3 text-slate-400 hover:text-slate-200 text-xl"
+          className="text-muted"
+          style={{ position: 'absolute', top: '8px', right: '12px', fontSize: '1.25rem' }}
           aria-label="Close"
         >
           ×
         </button>
 
-        {loading && <p className="text-sm text-slate-400 animate-pulse">Loading {code}…</p>}
+        {loading && <p className="text-muted" style={{ fontSize: '0.875rem' }}>Loading {code}…</p>}
         {error && error.includes("404") ? (
-          <div className="text-center py-6">
+          <div className="center" style={{ padding: '24px 0' }}>
             <h2 className="text-2xl font-semibold text-[#7FC692] mb-2">
               {(() => {
                 let code = lastQuery.current;

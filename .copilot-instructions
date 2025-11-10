@@ -1,13 +1,47 @@
-# Copilot instructions for Finagler Tailwind→Semantic refactor
+# Copilot instructions for Finagler Full Semantic Refactor
+# Source of truth: src/base.css
 
 Objective:
-Convert all Tailwind utility classNames (e.g., p-*, m-*, bg-*, text-*, flex, gap-*, items-*, justify-*, border-*, rounded-*, shadow-*) 
-into semantic classNames that correspond to the vocabulary defined in base.css.
+Refactor all JSX/TSX files in the Finagler project to use semantic classNames
+defined in src/base.css instead of Tailwind utilities or inline style objects.
 
-Rules:
-- Allowed classNames: panel, sidebar, toolbar, button, field, list, text-muted, warning, flex, column, row, center, gap-sm, gap-md, pad-sm, pad-md
-- Combine classes logically (e.g. className="panel flex column gap-md")
-- Remove all Tailwind-specific utility names
-- Preserve existing JSX hierarchy and functional behavior
-- Do NOT invent new one-off classes
-- Assume every component inherits base.css and domain-specific overrides
+Scope:
+- Convert ALL Tailwind utility classNames (bg-*, p-*, m-*, text-*, flex, gap-*,
+  items-*, justify-*, border-*, rounded-*, shadow-*, etc.)
+- Convert ALL inline style={{…}} props to equivalent semantic classNames.
+- Remove remaining inline style props entirely.
+- Skip backend, schema, bridge, or config code (UI components only).
+
+Allowed Vocabulary (defined in base.css):
+panel, sidebar, toolbar, button, field, list, list-item,
+text-muted, text-accent, warning, selected,
+flex, column, row, center, flex-between, flex-gap,
+gap-sm, gap-md, pad-sm, pad-md,
+text-sm, text-md, text-lg, font-bold, font-light,
+rounded, w-full, h-full, mr-sm, mr-md, scroll, scroll-area,
+clickable, app-container, app-body, main-content, center-content, center-content-column,
+table, loading-text, error-text, error-detail, fade-transition, fade-in, fade-out
+
+Guidelines:
+- Combine classes logically: e.g. className="panel flex column gap-md"
+- Maintain all JSX structure and functional behavior exactly.
+- Do NOT invent new or one-off classNames.
+- Map inline style values to the closest semantic class (e.g. marginRight: '8px' → mr-md).
+- If a color or background style (e.g. '#00B97A', '#d97706') is present,
+  remove it and rely on domain CSS variables (--accent, --fg, --bg).
+- Preserve all React logic, state, and hooks.
+
+Special Rules:
+- Dynamic inline styles using computed values (e.g. width: dynamicWidth) may remain inline.
+- When multiple style props map to the same concept (e.g. padding + gap),
+  use a single semantic equivalent if it matches intent.
+- All text/font spacing or weight should map to text-sm/text-md/text-lg or font-bold/font-light.
+
+Verification:
+After each batch, run `npm run dev` to confirm visuals and interactivity are unchanged.
+Domain theme switching should still affect colors and accents correctly.
+
+Notes:
+src/base.css defines the canonical design vocabulary.
+If future helper classes are added there, Copilot may use them automatically.
+Never modify base.css automatically — all new helpers must be added manually.

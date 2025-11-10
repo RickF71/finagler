@@ -7,6 +7,7 @@ export default function NightfieldCard({
   subtitle,
   detail,
   className = "",
+  style = {},
   children,
   active = false,
   innerAnimated = false,
@@ -37,34 +38,50 @@ export default function NightfieldCard({
     <motion.div
       animate={defaultAnimate}
       transition={defaultTransition}
-      className={`relative rounded-2xl border border-slate-700 bg-slate-900/60 
-                  overflow-hidden shadow-lg transition-all duration-500 ease-out 
-                  hover:shadow-[0_0_20px_var(--tw-shadow-color,rgba(255,255,255,0.08))] ${className}`}
+      className={`panel ${className || ''}`}
+      style={{ 
+        position: 'relative',
+        borderRadius: '16px',
+        overflow: 'hidden',
+        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+        transition: 'all 0.5s ease-out',
+        ...style
+      }}
     >
       {/* Ambient background field */}
       <div
-        className={`absolute inset-0 bg-gradient-to-b ${colorMap[variant]} 
-                    opacity-60 blur-2xl pointer-events-none`}
+        style={{
+          position: 'absolute',
+          inset: '0',
+          background: `linear-gradient(to bottom, ${colorMap[variant]})`,
+          opacity: '0.6',
+          filter: 'blur(32px)',
+          pointerEvents: 'none'
+        }}
       />
 
-      <div className="relative p-4 z-10">
+      <div className="panel pad-md" style={{ position: 'relative', zIndex: '10' }}>
         {/* Header */}
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-lg font-semibold text-slate-200">{title}</h2>
+        <div className="flex center gap-md" style={{ justifyContent: 'space-between', marginBottom: '8px' }}>
+          <h2 style={{ fontSize: '1.125rem', fontWeight: '600' }}>{title}</h2>
 
           {showHeartbeat && (
-            <div className="flex items-center justify-end gap-1">
+            <div className="flex center gap-sm" style={{ justifyContent: 'flex-end' }}>
               {heartbeatIcon ? (
                 <div
-                  className={`heartbeat-ring flex items-center justify-center rounded-lg p-[2px] w-6 h-6 ${
+                  className={`heartbeat-ring flex center ${
                     innerAnimated ? "opacity-60" : ""
                   }`}
                   style={{
+                    borderRadius: '8px',
+                    padding: '2px',
+                    width: '24px',
+                    height: '24px',
                     ['--hb-duration']: `${heartbeatDuration}s`,
                     ['--hb-color']: `var(--${heartbeatColor.replace('bg-', '')}, ${heartbeatColor})`,
                   }}
                 >
-                  <span className="text-base text-slate-300">{heartbeatIcon}</span>
+                  <span style={{ fontSize: '1rem' }}>{heartbeatIcon}</span>
                 </div>
               ) : (
                 <Heartbeat color={heartbeatColor} duration={heartbeatDuration} size={8} />
@@ -73,9 +90,9 @@ export default function NightfieldCard({
           )}
         </div>
 
-        {subtitle && <p className="text-sm text-slate-400">{subtitle}</p>}
-        {detail && <p className="text-xs text-slate-500 mt-1">{detail}</p>}
-        {children && <div className="mt-3">{children}</div>}
+        {subtitle && <p className="text-muted" style={{ fontSize: '0.875rem' }}>{subtitle}</p>}
+        {detail && <p className="text-muted" style={{ fontSize: '0.75rem', marginTop: '4px' }}>{detail}</p>}
+        {children && <div style={{ marginTop: '12px' }}>{children}</div>}
       </div>
 
       {/* Styling for heartbeat aura */}

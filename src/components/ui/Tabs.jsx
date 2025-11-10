@@ -2,7 +2,7 @@ import React from "react";
 
 export function Tabs({ value, onValueChange, children }) {
   return (
-    <div className="flex flex-col w-full">
+    <div className="column" style={{ width: '100%' }}>
       {React.Children.map(children, (child) =>
         React.cloneElement(child, { currentValue: value, onValueChange })
       )}
@@ -12,7 +12,7 @@ export function Tabs({ value, onValueChange, children }) {
 
 export function TabsList({ children }) {
   return (
-    <div className="inline-flex bg-[#0E1319] border border-[#2A3642] rounded-md overflow-hidden">
+    <div className="toolbar" style={{ display: 'inline-flex', overflow: 'hidden', borderRadius: '6px' }}>
       {children}
     </div>
   );
@@ -23,11 +23,13 @@ export function TabsTrigger({ value, currentValue, onValueChange, children }) {
   return (
     <button
       onClick={() => onValueChange(value)}
-      className={`px-4 py-2 text-sm font-medium transition-colors ${
-        isActive
-          ? "bg-[#00B97A] text-black"
-          : "bg-transparent text-gray-300 hover:text-white"
-      }`}
+      className={`button ${isActive ? 'selected' : ''}`}
+      style={{ 
+        fontSize: '0.875rem',
+        fontWeight: '500',
+        backgroundColor: isActive ? '#00B97A' : 'transparent',
+        color: isActive ? 'black' : undefined
+      }}
     >
       {children}
     </button>
@@ -36,5 +38,5 @@ export function TabsTrigger({ value, currentValue, onValueChange, children }) {
 
 export function TabsContent({ value, currentValue, children }) {
   if (currentValue !== value) return null;
-  return <div className="mt-4">{children}</div>;
+  return <div style={{ marginTop: '16px' }}>{children}</div>;
 }

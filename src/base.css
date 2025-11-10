@@ -261,3 +261,18 @@ html, body, #root {
   --accent: #44ff44;
   --border: #2a2;
 }
+/* --- Additional Semantic Helpers (for Copilot mapping) --- */
+.text-sm     { font-size: 0.875rem; }
+.text-md     { font-size: 1rem; }
+.text-lg     { font-size: 1.125rem; }
+.font-bold   { font-weight: 600; }
+.font-light  { font-weight: 300; }
+
+.rounded     { border-radius: 6px; }
+.w-full      { width: 100%; }
+.h-full      { height: 100%; }
+
+.mr-sm       { margin-right: 4px; }
+.mr-md       { margin-right: 8px; }
+
+.scroll      { overflow: auto; }

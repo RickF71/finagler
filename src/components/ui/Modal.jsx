@@ -3,18 +3,19 @@ import React from "react";
 export default function Modal({ open, onClose, title, children }) {
   if (!open) return null;
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-      <div className="bg-[#111820] border border-[#2A3642] rounded-xl w-[480px] shadow-lg p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-[#00B97A]">{title}</h2>
+    <div className="center" style={{ position: 'fixed', inset: '0', backgroundColor: 'rgba(0,0,0,0.7)', zIndex: '50' }}>
+      <div className="panel pad-md" style={{ width: '480px', borderRadius: '12px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}>
+        <div className="flex center gap-md" style={{ justifyContent: 'space-between', marginBottom: '16px' }}>
+          <h2 style={{ fontSize: '1.125rem', fontWeight: '600' }}>{title}</h2>
           <button
-            className="text-gray-400 hover:text-white"
+            className="text-muted"
             onClick={onClose}
+            style={{ fontSize: '1rem' }}
           >
             ✕
           </button>
         </div>
-        <div className="text-gray-300">{children}</div>
+        <div>{children}</div>
       </div>
     </div>
   );

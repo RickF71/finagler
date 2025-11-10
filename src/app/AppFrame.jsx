@@ -33,7 +33,7 @@ export default function AppFrame() {
 
   // Loading or chooser states
   if (!activeDomainId) return <DomainChooser />;
-  if (loading) return <div className="p-6 text-gray-400">Loading domain…</div>;
+  if (loading) return <div className="pad-md text-muted">Loading domain…</div>;
 
   return (
     <div className={`relative bg-black ${fade}`}>

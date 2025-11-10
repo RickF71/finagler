@@ -2,12 +2,12 @@ import React from "react";
 
 export default function Table({ columns = [], data = [] }) {
   return (
-    <div className="overflow-x-auto border border-[#2A3642] rounded-lg">
-      <table className="min-w-full text-sm text-gray-300">
-        <thead className="bg-[#0E1319] text-gray-400 border-b border-[#2A3642]">
+    <div className="list" style={{ overflowX: 'auto', borderRadius: '8px' }}>
+      <table className="text-muted" style={{ minWidth: '100%', fontSize: '0.875rem' }}>
+        <thead className="toolbar text-muted">
           <tr>
             {columns.map((col) => (
-              <th key={col} className="px-4 py-2 text-left font-medium">
+              <th key={col} className="pad-sm" style={{ textAlign: 'left', fontWeight: '500' }}>
                 {col}
               </th>
             ))}
@@ -15,9 +15,9 @@ export default function Table({ columns = [], data = [] }) {
         </thead>
         <tbody>
           {data.map((row, i) => (
-            <tr key={i} className="hover:bg-[#1A242E] border-b border-[#2A3642]">
+            <tr key={i} className="list-item" style={{ borderBottom: '1px solid rgba(42, 54, 66, 1)' }}>
               {columns.map((col) => (
-                <td key={col} className="px-4 py-2">
+                <td key={col} className="pad-sm">
                   {row[col]}
                 </td>
               ))}

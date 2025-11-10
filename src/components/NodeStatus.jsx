@@ -61,20 +61,20 @@ export default function NodeStatus() {
   }, [activeDomainId]);
 
   return (
-    <div className="p-4">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-semibold text-blue-300">🧩 Node Overview</h2>
+    <div className="pad-md">
+      <div className="flex center gap-md" style={{ justifyContent: 'space-between', marginBottom: '16px' }}>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: '600' }}>🧩 Node Overview</h2>
         <button
           onClick={fetchStatus}
-          className="px-3 py-1 bg-blue-600 hover:bg-blue-500 rounded-md"
+          className="button"
         >
           Refresh
         </button>
       </div>
-      {loading && <div className="text-gray-400">Loading...</div>}
-      {error && <div className="text-red-400">Error: {error}</div>}
+      {loading && <div className="text-muted">Loading...</div>}
+      {error && <div className="warning">Error: {error}</div>}
       {status && (
-        <pre className="bg-slate-800 rounded-xl p-4 text-sm overflow-auto border border-slate-700">
+        <pre className="panel pad-md text-muted" style={{ fontSize: '0.875rem', overflow: 'auto' }}>
           {JSON.stringify(status, null, 2)}
         </pre>
       )}

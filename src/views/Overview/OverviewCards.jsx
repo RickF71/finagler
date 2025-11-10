@@ -10,8 +10,13 @@ export default function OverviewCards({ loading }) {
 
   return (
     <div
-      className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4
-                 p-2 transition-all duration-500"
+      style={{ 
+        display: 'grid', 
+        gap: '1.5rem', 
+        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+        padding: '0.5rem',
+        transition: 'all 0.5s'
+      }}
     >
       {/* 🌿 System Status */}
       <NightfieldCard
@@ -29,7 +34,7 @@ export default function OverviewCards({ loading }) {
         heartbeatIcon="⚙️"
         heartbeatColor={nodeOk ? 'bg-emerald-400' : 'bg-rose-500'}
         heartbeatDuration={hbDuration}
-        className="hover:shadow-emerald-500/20"
+        style={{ boxShadow: '0 0 20px rgba(16, 185, 129, 0.2)' }}
       />
 
       {/* 👥 Identity Anchor */}
@@ -45,7 +50,7 @@ export default function OverviewCards({ loading }) {
         heartbeatIcon="🧩"
         heartbeatColor="bg-slate-400"
         heartbeatDuration={1.8}
-        className="hover:shadow-slate-400/20"
+        style={{ boxShadow: '0 0 20px rgba(148, 163, 184, 0.2)' }}
       />
 
       {/* 🌍 Terra Overlay */}
@@ -63,7 +68,7 @@ export default function OverviewCards({ loading }) {
         heartbeatIcon="🌍"
         heartbeatColor="bg-blue-400"
         heartbeatDuration={1.5}
-        className="hover:shadow-blue-500/20"
+        style={{ boxShadow: '0 0 20px rgba(59, 130, 246, 0.2)' }}
       />
 
       {/* 🛰️ Network Peers */}
@@ -81,12 +86,12 @@ export default function OverviewCards({ loading }) {
         heartbeatIcon="🛰️"
         heartbeatColor={peers.length > 0 ? 'bg-cyan-400' : 'bg-slate-500'}
         heartbeatDuration={1.4}
-        className="hover:shadow-cyan-500/20"
+        style={{ boxShadow: '0 0 20px rgba(34, 211, 238, 0.2)' }}
       >
         {peers.length > 0 && (
-          <div className="text-xs text-slate-400 leading-relaxed space-y-0.5">
+          <div className="text-muted" style={{ fontSize: '0.75rem', lineHeight: '1.6' }}>
             {peers.map(p => (
-              <div key={p.address}>
+              <div key={p.address} style={{ marginBottom: '2px' }}>
                 {p.address} ({p.healthy ? 'OK' : 'Down'})
               </div>
             ))}
@@ -103,7 +108,7 @@ export default function OverviewCards({ loading }) {
         heartbeatIcon="🪞"
         heartbeatColor="bg-violet-400"
         heartbeatDuration={1.3}
-        className="hover:shadow-violet-500/20"
+        style={{ boxShadow: '0 0 20px rgba(167, 139, 250, 0.2)' }}
       >
         <MirrorSpinStatus />
       </NightfieldCard>

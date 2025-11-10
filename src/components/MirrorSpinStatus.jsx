@@ -23,7 +23,7 @@ export default function MirrorSpinStatus() {
         initial={{ opacity: 0.4, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6 }}
-        className="text-slate-400"
+        className="text-muted"
       >
         <p>Loading MirrorSpin status…</p>
       </motion.div>
@@ -38,14 +38,14 @@ export default function MirrorSpinStatus() {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="space-y-1"
+      className="column gap-sm"
     >
 
 
       {error ? (
-        <p className="text-sm text-rose-400">Error: {error}</p>
+        <p className="warning" style={{ fontSize: '0.875rem' }}>Error: {error}</p>
       ) : (
-        <div className="text-sm text-slate-300 space-y-1">
+        <div className="text-muted column gap-sm" style={{ fontSize: '0.875rem' }}>
           <p>Last Check: {last_check}</p>
           <p>Event Count: {event_count}</p>
           <p>Uptime: {formatUptime(parseGoDuration(uptime))}</p>
