@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
+import { listDomains, getDomainLinks } from "../lib/api";
 
 export default function DomainGraphView() {
   const svgRef = useRef(null);
@@ -7,12 +8,12 @@ export default function DomainGraphView() {
   const [links, setLinks] = useState([]);
 
   // -------------------------------
-  // Fetch domains + links
+  // Fetch domains + links using centralized API
   // -------------------------------
   useEffect(() => {
     Promise.all([
-      fetch("http://localhost:8080/api/domain/list").then(r => r.json()),
-      fetch("http://localhost:8080/api/domain/links").then(r => r.json()).catch(() => []),
+      listDomains(),
+      getDomainLinks().catch(() => []),
     ]).then(([domains, links]) => {
       setDomains(domains);
       setLinks(links || []);

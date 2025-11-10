@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { getDomainInfo } from "../lib/api";
 import iso2to3 from "../lib/iso3166.js";
 import iso3toName from "../lib/iso3166_name.js";
 
@@ -16,23 +17,15 @@ export default function DomainModal({ code, onClose }) {
 
     (async () => {
       try {
-        const url = `http://localhost:8080/api/domain/info?code=${encodeURIComponent(code)}`;
-        const res = await fetch(url);
-        if (!res.ok) {
-          let msg = `HTTP ${res.status}`;
-          // Try to parse error JSON for 404
-          try {
-            const errJson = await res.json();
-            if (res.status === 404 && errJson && errJson.error) {
-              msg = `404 Not Found: ${errJson.error}`;
-            }
-          } catch {}
-          throw new Error(msg);
-        }
-        const parsed = await res.json();
+        const parsed = await getDomainInfo(code);
         setDomain(parsed);
       } catch (err) {
-        setError(err.message);
+        let msg = err.message;
+        // Handle 404 errors specifically
+        if (err.message.includes('404')) {
+          msg = `404 Not Found: Domain with code '${code}' not found`;
+        }
+        setError(msg);
       } finally {
         setLoading(false);
       }

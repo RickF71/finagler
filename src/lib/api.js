@@ -43,3 +43,13 @@ export const getTerraOverlay = (region = "world", nocache = true) => {
   const q = `?region=${encodeURIComponent(region)}` + (nocache ? `&nocache=${Date.now()}` : "");
   return request(`/api/terra/map${q}`);
 };
+
+// Domain management
+export const listDomains = () => request("/api/domain");
+export const getDomain = (domainId) => request(`/api/domain/${domainId}`);
+export const getDomainTheme = (domainId) => request(`/api/domain/theme/${domainId}`);
+export const getDomainLinks = () => request("/api/domain/links");
+export const getDomainInfo = (code) => request(`/api/domain/info?code=${encodeURIComponent(code)}`);
+
+// Get the default domain UUID from the backend
+export const getDefaultDomain = () => request("/api/domain/default");

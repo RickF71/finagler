@@ -1,0 +1,31 @@
+/* Finagler base (none-mode) theme */
+:root {
+  --finagler-bg: #0f172a;  /* slate-950 */
+  --finagler-fg: #e2e8f0;  /* slate-100 */
+  --finagler-accent: #334155;
+}
+
+html,
+body,
+#root {
+  background-color: var(--finagler-bg);
+  color: var(--finagler-fg);
+  height: 100%;
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}
+
+/* Basic chrome surfaces */
+header,
+footer {
+  background-color: #1e293b;
+  color: var(--finagler-fg);
+}
+
+/* Utility classes you can re-use */
+.bg-finagler {
+  background-color: var(--finagler-bg);
+}
+.text-finagler {
+  color: var(--finagler-fg);
+}

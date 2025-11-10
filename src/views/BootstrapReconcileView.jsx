@@ -5,10 +5,14 @@ import YAML from "js-yaml";
 import { Card, CardHeader, CardContent } from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Loader2, Save, CheckCircle2, XCircle } from "lucide-react";
-import Toast from "@/components/ui/Toast";
+import { toast } from "react-hot-toast";
+import { createDISInterface } from "../dis/interface.js";
+import { useDomain } from "../context/DomainContext.jsx";
+
 
 export default function BootstrapReconcileView() {
   const { id } = useParams();
+  const { API_BASE } = useDomain();
   const decodedId = decodeURIComponent(id);
 
   const [data, setData] = useState(null);
@@ -16,6 +20,9 @@ export default function BootstrapReconcileView() {
   const [error, setError] = useState(null);
   const [toast, setToast] = useState(null);
   const [detectedType, setDetectedType] = useState("unknown");
+  
+  // Initialize DIS interface
+  const dis = createDISInterface(API_BASE);
   // state you likely already have
   const [loadedFile, setLoadedFile] = useState(null); // { id, filename, rel_path, ... }
 
@@ -41,11 +48,7 @@ export default function BootstrapReconcileView() {
 
   // Load bootstrap content
   useEffect(() => {
-    fetch(`/api/bootstrap/${encodeURIComponent(decodedId)}`)
-      .then((r) => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.text();
-      })
+    dis.getBootstrap(decodedId)
       .then((text) => {
         setData({ content: text });
         let parsed = {};
@@ -59,7 +62,8 @@ export default function BootstrapReconcileView() {
         const isDomain =
           meta.domain_id ||
           (meta.type && meta.type.startsWith("domain.")) ||
-          decodedId.startsWith("domain.");
+          // Check if domain_id looks like a UUID
+          (meta.domain_id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(meta.domain_id));
         setDetectedType(isDomain ? "domain" : "schema");
 
         setForm({
@@ -88,19 +92,11 @@ export default function BootstrapReconcileView() {
   };
 
   const handleSave = () => {
-    fetch("/api/bootstrap/reconcile", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: decodedId,
-        ...form,
-        content: data?.content || "",
-      }),
+    dis.reconcileBootstrap({
+      id: decodedId,
+      ...form,
+      content: data?.content || "",
     })
-      .then((r) => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json();
-      })
       .then(() =>
         setToast({ type: "success", msg: "Bootstrap saved successfully." })
       )
@@ -168,7 +164,7 @@ export default function BootstrapReconcileView() {
                   label="Domain"
                   value={form.domain}
                   onChange={(v) => handleChange("domain", v)}
-                  placeholder="e.g. domain.terra"
+                  placeholder="e.g. a1b2c3d4-e5f6-7890-abcd-ef1234567890"
                 />
               </>
             ) : (
@@ -177,7 +173,7 @@ export default function BootstrapReconcileView() {
                   label="Domain ID"
                   value={form.domain_id}
                   onChange={(v) => handleChange("domain_id", v)}
-                  placeholder="e.g. domain.usa.wisconsin"
+                  placeholder="e.g. f1e2d3c4-b5a6-9870-dcba-1234567890ef"
                 />
                 <Field
                   label="Domain Version"
@@ -189,22 +185,14 @@ export default function BootstrapReconcileView() {
                   label="Parent Domain"
                   value={form.parent_domain}
                   onChange={(v) => handleChange("parent_domain", v)}
-                  placeholder="e.g. domain.usa"
+                  placeholder="e.g. 12345678-9abc-def0-1234-567890abcdef"
                 />
               </>
             )}
 
             <Button
               onClick={() => {
-                fetch("http://localhost:8080/api/bootstrap/canonize", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ filename: decodedId }),
-                })
-                  .then((res) => {
-                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                    return res.json();
-                  })
+                dis.canonizeBootstrap({ filename: decodedId })
                   .then(() =>
                     setToast({
                       type: "success",

@@ -1,11 +1,13 @@
+import { useEffect } from "react";
+import { getDomainTheme } from "../lib/api";
+
 function useDomainVisuals(domainId) {
   useEffect(() => {
     if (!domainId) return;
 
     console.log("🎨 loading domain theme:", domainId);
 
-    fetch(`http://localhost:8080/api/domain/theme/${domainId}`)
-      .then(r => r.json())
+    getDomainTheme(domainId)
       .then(({ css }) => {
         console.log("✅ theme received");
 
@@ -21,3 +23,5 @@ function useDomainVisuals(domainId) {
       .catch(err => console.error("❌ theme load error:", err));
   }, [domainId]);
 }
+
+export default useDomainVisuals;

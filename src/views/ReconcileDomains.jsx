@@ -1,18 +1,21 @@
 import { useEffect, useState } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/Card";
 import { Loader2 } from "lucide-react";
+import { createDISInterface } from "../dis/interface.js";
+import { useDomain } from "../context/DomainContext.jsx";
 
 export default function ReconcileDomains() {
+  const { API_BASE } = useDomain();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/reconcile/domains")
-      .then((r) => r.json())
+    const dis = createDISInterface(API_BASE);
+    dis.reconcileDomains()
       .then((res) => setData(res.items || []))
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
+  }, [API_BASE]);
 
   if (loading)
     return (

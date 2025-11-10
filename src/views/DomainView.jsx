@@ -1,24 +1,29 @@
-import { Outlet, useParams, Link } from "react-router-dom";
+// src/views/DomainView.jsx
+import React from "react";
+import { useUI } from "../context/UIContext";
+import DomainOverview from "./DomainOverview.jsx";
+import DomainFileList from "./DomainFileList.jsx";
+import DomainCSSEditor from "./DomainCSSEditor.jsx";
 
+/**
+ * DomainView Router
+ * - Acts as a router for domain-related views
+ * - Switches between DomainOverview, DomainFileList, and DomainCSSEditor based on view state
+ * - Logs current view for debugging
+ */
 export default function DomainView() {
-  const { id } = useParams();
+  const { view } = useUI();
+  
+  // Log the current view for debugging
+  console.log("DomainView router - current view:", view);
 
-  return (
-    <div className="flex flex-col gap-3">
-      <h1 className="text-xl font-bold">{id}</h1>
-
-      {/* Button to load CSS editor in right pane */}
-      <Link
-        className="bg-yellow-500 text-black px-3 py-1 rounded hover:bg-yellow-400"
-        to={`/domain/${id}/css`}
-      >
-        🎨 Edit CSS
-      </Link>
-
-      {/* Right-pane outlet */}
-      <div className="mt-4 border rounded p-3">
-        <Outlet />
-      </div>
-    </div>
-  );
+  switch (view) {
+    case "files":
+      return <DomainFileList />;
+    case "css-editor":
+      return <DomainCSSEditor />;
+    case "overview":
+    default:
+      return <DomainOverview />;
+  }
 }

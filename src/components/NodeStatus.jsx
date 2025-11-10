@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { getStatus } from "../lib/api";
+import { getStatus, getDomain } from "../lib/api";
+import { useDomain } from "../context/DomainContext";
 
 export default function NodeStatus() {
   const [status, setStatus] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const { activeDomainId } = useDomain();
 
   const fetchStatus = async () => {
     try {
@@ -26,6 +28,38 @@ export default function NodeStatus() {
     return () => clearInterval(timer);
   }, []);
 
+  // Load domain styling using the active domain UUID
+  useEffect(() => {
+    if (!activeDomainId) return;
+
+    async function loadDomainStyles() {
+      try {
+        const domainData = await getDomain(activeDomainId);
+        const { css, jsx } = domainData;
+        
+        if (css) {
+          // Remove any existing domain styles
+          const existingStyle = document.getElementById("domain-node-styles");
+          if (existingStyle) existingStyle.remove();
+          
+          const style = document.createElement("style");
+          style.id = "domain-node-styles";
+          style.innerHTML = css;
+          document.head.appendChild(style);
+        }
+        
+        // Note: JSX injection is commented out as it could override the React app
+        // if (jsx) {
+        //   document.getElementById("root").innerHTML = jsx;
+        // }
+      } catch (err) {
+        console.warn("Failed to load domain styles:", err);
+      }
+    }
+    
+    loadDomainStyles();
+  }, [activeDomainId]);
+
   return (
     <div className="p-4">
       <div className="flex items-center justify-between mb-4">
@@ -46,23 +80,4 @@ export default function NodeStatus() {
       )}
     </div>
   );
-
-
 }
-
-
-  useEffect(() => {
-    async function loadDIS() {
-      const res = await fetch("/api/domain/dis/domain.user.rick");
-      const { css, jsx } = await res.json();
-      if (css) {
-        const style = document.createElement("style");
-        style.innerHTML = css;
-        document.head.appendChild(style);
-      }
-      if (jsx) {
-        document.getElementById("root").innerHTML = jsx;
-      }
-    }
-    loadDIS();
-  }, []);

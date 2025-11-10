@@ -1,0 +1,228 @@
+/* ==========================================
+   Finagler Base Styles (Refactor Foundation)
+   Phase: Inline → Class-based normalization
+   ========================================== */
+
+:root {
+  --fg: #ddd;
+  --bg: #111;
+  --accent: #0ff;
+  --muted: #666;
+  --border: #333;
+  --radius: 8px;
+  --pad: 8px;
+  --gap: 8px;
+  --font-main: system-ui, sans-serif;
+}
+
+/* --- Global baseline --- */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  color: var(--fg);
+  background-color: var(--bg);
+  font-family: var(--font-main);
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* --- Common building blocks --- */
+.panel {
+  background: #181818;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--pad);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  width: 240px;
+  border-right: 1px solid var(--border);
+  background: #101010;
+  padding: var(--pad);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--pad);
+  border-bottom: 1px solid var(--border);
+  background: #161616;
+}
+
+.button {
+  background: transparent;
+  border: 1px solid var(--fg);
+  color: var(--fg);
+  border-radius: 4px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.button:hover {
+  background: var(--accent);
+  color: #000;
+}
+
+.field {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 6px;
+  background: #0a0a0a;
+  color: var(--fg);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.text-muted {
+  color: var(--muted);
+  font-size: 0.9em;
+}
+
+.text-accent {
+  color: var(--accent);
+}
+
+.warning {
+  color: #ff6;
+  border-color: #ff6;
+}
+
+/* --- Table styles --- */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: var(--pad);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.table th {
+  color: var(--muted);
+  background: #161616;
+}
+
+.table tr:hover {
+  background: #222;
+}
+
+/* --- Layout helpers --- */
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flex-gap {
+  display: flex;
+  gap: var(--gap);
+}
+
+.scroll-area {
+  overflow: auto;
+  max-height: 70vh;
+  border-top: 1px solid var(--border);
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:hover {
+  text-decoration: underline;
+}
+
+/* --- Layout classes --- */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.app-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.main-content {
+  flex: 1;
+  overflow: auto;
+  padding: var(--pad);
+}
+
+.center-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.center-content-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: var(--gap);
+}
+
+.fade-transition {
+  transition: opacity 300ms ease;
+}
+
+.fade-in {
+  opacity: 1;
+}
+
+.fade-out {
+  opacity: 0;
+}
+
+.loading-text {
+  color: var(--muted);
+}
+
+.error-text {
+  color: #ff6;
+}
+
+.error-detail {
+  font-size: 0.9em;
+  opacity: 0.8;
+}
+
+/* --- Domain scopes (for overrides) --- */
+.domain-null {
+  --bg: #000;
+  --fg: #0ff;
+  --accent: #ff0099;
+  --border: #222;
+}
+.domain-terra {
+  --bg: #101f10;
+  --fg: #bfffbf;
+  --accent: #44ff44;
+  --border: #2a2;
+}

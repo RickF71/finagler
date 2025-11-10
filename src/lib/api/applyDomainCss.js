@@ -1,10 +1,9 @@
+import { getDomain } from "../api";
+
 export async function applyDomainCss(domainId) {
   try {
-    // Fetch CSS from your backend
-    const res = await fetch(`/api/domain/${domainId}`);
-    if (!res.ok) throw new Error(`fetch failed: ${res.statusText}`);
-
-    const json = await res.json();
+    // Fetch domain data from centralized API
+    const json = await getDomain(domainId);
     const css = json?.css ?? "";
 
     // Find or create a <style> tag

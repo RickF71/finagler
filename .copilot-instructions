@@ -1,0 +1,13 @@
+# Copilot instructions for Finagler Tailwind→Semantic refactor
+
+Objective:
+Convert all Tailwind utility classNames (e.g., p-*, m-*, bg-*, text-*, flex, gap-*, items-*, justify-*, border-*, rounded-*, shadow-*) 
+into semantic classNames that correspond to the vocabulary defined in base.css.
+
+Rules:
+- Allowed classNames: panel, sidebar, toolbar, button, field, list, text-muted, warning, flex, column, row, center, gap-sm, gap-md, pad-sm, pad-md
+- Combine classes logically (e.g. className="panel flex column gap-md")
+- Remove all Tailwind-specific utility names
+- Preserve existing JSX hierarchy and functional behavior
+- Do NOT invent new one-off classes
+- Assume every component inherits base.css and domain-specific overrides
