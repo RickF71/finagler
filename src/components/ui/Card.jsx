@@ -16,6 +16,14 @@ export function CardHeader({ children, className = "" }) {
   );
 }
 
+export function CardTitle({ children, className = "" }) {
+  return (
+    <h3 className={`text-lg font-semibold ${className}`}>
+      {children}
+    </h3>
+  );
+}
+
 export function CardContent({ children, className = "" }) {
   return <div className={`p-4 text-gray-300 ${className}`}>{children}</div>;
 }

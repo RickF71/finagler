@@ -10,7 +10,7 @@ export default function DomainLayout() {
 
   if (!activeUI)
     return (
-      <div className="flex-1 flex items-center justify-center text-slate-400">
+      <div className="center text-muted" style={{ flex: '1' }}>
         <p>Loading domain view…</p>
       </div>
     );
@@ -18,11 +18,11 @@ export default function DomainLayout() {
   const { viewModel } = activeUI;
 
   return (
-    <div className={`flex min-h-screen lens-${viewModel.style}`}>
+    <div className={`app-container lens-${viewModel.style}`}>
       <Sidebar />
-      <main className="flex-1 p-6 overflow-auto">
+      <main className="main-content">
         {viewModel.mode === "json" && (
-          <pre className="text-xs">{JSON.stringify(domain, null, 2)}</pre>
+          <pre className="text-sm">{JSON.stringify(domain, null, 2)}</pre>
         )}
         <button
           onClick={() =>
@@ -31,7 +31,8 @@ export default function DomainLayout() {
                 viewModel.style === "literal" ? "metaphoric" : "literal",
             })
           }
-          className="mt-4 text-xs border border-slate-600 px-2 py-1 rounded"
+          className="button text-sm"
+          style={{ marginTop: '16px' }}
         >
           Toggle Lens
         </button>

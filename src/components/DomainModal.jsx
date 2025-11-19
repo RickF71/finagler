@@ -70,7 +70,7 @@ export default function DomainModal({ code, onClose }) {
         {loading && <p className="text-muted" style={{ fontSize: '0.875rem' }}>Loading {code}…</p>}
         {error && error.includes("404") ? (
           <div className="center" style={{ padding: '24px 0' }}>
-            <h2 className="text-2xl font-semibold text-[#7FC692] mb-2">
+            <h2 className="text-lg font-bold text-accent" style={{ marginBottom: '8px' }}>
               {(() => {
                 let code = lastQuery.current;
                 if (code === "-99") code = "FRA";
@@ -82,35 +82,35 @@ export default function DomainModal({ code, onClose }) {
                 return iso3;
               })()}
             </h2>
-            <div className="text-lg text-slate-400 mt-2">NO DATA</div>
+            <div className="text-muted" style={{ fontSize: '1.125rem', marginTop: '8px' }}>NO DATA</div>
           </div>
         ) : error ? (
-          <div className="text-sm text-rose-400">Error: {error}</div>
+          <div className="warning text-sm">Error: {error}</div>
         ) : null}
 
         {domain && (
-          <div className="animate-fade-in">
-            <h2 className="text-2xl font-semibold text-[#7FC692] mb-2">{domain.name}</h2>
-            <p className="text-sm text-slate-400 mb-3">({domain.code})</p>
+          <div>
+            <h2 className="text-lg font-bold text-accent" style={{ marginBottom: '8px' }}>{domain.name}</h2>
+            <p className="text-sm text-muted" style={{ marginBottom: '12px' }}>({domain.code})</p>
 
-            <div className="space-y-2 text-sm">
+            <div className="column gap-sm text-sm">
               <div>
-                <span className="text-slate-400">Seat:</span>{" "}
-                <span className="text-slate-100">{domain.seat}</span>
+                <span className="text-muted">Seat:</span>{" "}
+                <span>{domain.seat}</span>
               </div>
               <div>
-                <span className="text-slate-400">Population:</span>{" "}
-                <span className="text-slate-100">{domain.population?.toLocaleString()}</span>
+                <span className="text-muted">Population:</span>{" "}
+                <span>{domain.population?.toLocaleString()}</span>
               </div>
               {domain.lineage?.length > 0 && (
                 <div>
-                  <span className="text-slate-400">Lineage:</span>{" "}
-                  <span className="text-slate-100">{domain.lineage.join(" → ")}</span>
+                  <span className="text-muted">Lineage:</span>{" "}
+                  <span>{domain.lineage.join(" → ")}</span>
                 </div>
               )}
             </div>
 
-            <p className="mt-4 text-slate-300 leading-relaxed whitespace-pre-line">
+            <p style={{ marginTop: '16px', lineHeight: '1.6', whiteSpace: 'pre-line' }}>
               {domain.description}
             </p>
           </div>

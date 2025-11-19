@@ -6,12 +6,9 @@ import { toast } from "react-hot-toast";
 import { createDISInterface } from "../dis/interface.js";
 import { useDomain } from "../context/DomainContext.jsx";
 
-export default function DomainSingleFile({ domainId, filename, autoOpen, onDeleted }) {
+export default function DomainSingleFile({ domainId, filename, fileInfo, autoOpen, onDeleted }) {
   const { setView, setActiveFile } = useUI();
   const { API_BASE } = useDomain();
-  const [preview, setPreview] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [deleteHover, setDeleteHover] = useState(false);
   const [editHover, setEditHover] = useState(false);
   const [fileHover, setFileHover] = useState(false);
@@ -19,6 +16,11 @@ export default function DomainSingleFile({ domainId, filename, autoOpen, onDelet
   
   // Initialize DIS interface
   const dis = createDISInterface(API_BASE);
+  
+  // Extract metadata from fileInfo prop (if available)
+  const preview = fileInfo?.preview || "";
+  const author = fileInfo?.author || "";
+  const size = fileInfo?.size || 0;
 
   // --------------------------------------------------
   // Empty / Not Found handling
@@ -35,7 +37,7 @@ export default function DomainSingleFile({ domainId, filename, autoOpen, onDelet
             if (!name) return;
 
             try {
-              await dis.saveFile(domainId, name, "");
+              await dis.file.saveFile(domainId, name, "");
 
               toast.success("New file created!");
               setActiveFile(name);
@@ -53,23 +55,11 @@ export default function DomainSingleFile({ domainId, filename, autoOpen, onDelet
   }
 
   // --------------------------------------------------
-  // Preview fetch
-  // --------------------------------------------------
-  useEffect(() => {
-    if (!domainId || !filename) return;
-    setLoading(true);
-    dis.getFile(domainId, filename)
-      .then((t) => setPreview(t.length > 200 ? t.slice(0, 200) + "…" : t))
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
-  }, [domainId, filename, dis]);
-
-  // --------------------------------------------------
   // Delete handler
   // --------------------------------------------------
   async function handleDeleteConfirm() {
     try {
-      await dis.deleteFile(domainId, filename);
+      await dis.file.deleteFile(domainId, filename);
 
       toast.success(`${filename} deleted`);
       setConfirmDelete(false);
@@ -186,15 +176,20 @@ export default function DomainSingleFile({ domainId, filename, autoOpen, onDelet
           <span className="text-slate-100 font-semibold text-sm truncate">
             {filename}
           </span>
+          {size > 0 && (
+            <span className="text-slate-500 text-xs">
+              {size < 1024 ? `${size}B` : `${(size / 1024).toFixed(1)}KB`}
+            </span>
+          )}
         </div>
 
-        {loading ? (
-          <div className="text-slate-400 text-sm">Loading…</div>
-        ) : error ? (
-          <div className="text-red-400 text-xs">{error}</div>
+        {preview ? (
+          <div className="text-slate-300 text-xs whitespace-pre-wrap max-h-24 overflow-y-auto border-t border-slate-700 pt-2 mt-1">
+            {preview}
+          </div>
         ) : (
-          <div className="text-slate-300 text-xs whitespace-pre-wrap max-h-24 overflow-y-auto border-t border-slate-700 pt-1">
-            {preview || "— empty file —"}
+          <div className="text-slate-400 text-xs mt-1 italic">
+            — empty file —
           </div>
         )}
       </div>

@@ -19,32 +19,32 @@ export default function ReconcileSchemas() {
 
   if (loading)
     return (
-      <div className="flex justify-center mt-10 text-gray-400">
-        <Loader2 className="animate-spin" />
+      <div className="center pad-md text-muted" style={{ marginTop: '40px' }}>
+        <Loader2 />
       </div>
     );
 
   return (
-    <div className="space-y-4 p-6">
-      <h2 className="text-2xl font-semibold text-white mb-4">
+    <div className="column gap-md pad-md">
+      <h2 className="text-lg font-bold" style={{ marginBottom: '16px' }}>
         Schema Reconciliation
       </h2>
 
       {data.length === 0 ? (
-        <p className="text-gray-400">
-          No schema discrepancies found <span className="text-[#00B97A]">🎉</span>
+        <p className="text-muted">
+          No schema discrepancies found <span className="text-accent">🎉</span>
         </p>
       ) : (
         data.map((item) => (
-          <Card key={item.id} className="p-4">
-            <div className="flex flex-col gap-1">
-              <div className="flex justify-between items-center">
-                <span className="text-[#00B97A] font-semibold">
+          <Card key={item.id} className="panel pad-md">
+            <div className="column gap-sm">
+              <div className="flex-between">
+                <span className="text-accent font-bold">
                   {item.schema_type}
                 </span>
-                <span className="text-sm text-gray-400">{item.file}</span>
+                <span className="text-sm text-muted">{item.file}</span>
               </div>
-              <p className="text-gray-300">{item.details}</p>
+              <p>{item.details}</p>
             </div>
           </Card>
         ))

@@ -1,0 +1,33 @@
+/* src/components/DisPowerRing.css */
+.dis-power-ring {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 10000;
+  transition: all 0.3s ease;
+  cursor: help;
+}
+
+.ring-online {
+  background: #f8d42c;
+  box-shadow: 0 0 8px #f8d42c, 0 0 16px rgba(248, 212, 44, 0.4);
+  animation: pulse-online 2s ease-in-out infinite;
+}
+
+.ring-offline {
+  background: #777;
+  box-shadow: 0 0 4px #555;
+  opacity: 0.7;
+}
+
+@keyframes pulse-online {
+  0%, 100% {
+    box-shadow: 0 0 8px #f8d42c, 0 0 16px rgba(248, 212, 44, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 12px #f8d42c, 0 0 24px rgba(248, 212, 44, 0.6);
+  }
+}

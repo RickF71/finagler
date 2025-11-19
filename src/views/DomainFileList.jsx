@@ -25,12 +25,13 @@ export default function DomainFileList({ domainId }) {
     if (!domain) return;
     setLoading(true);
     try {
-      const json = await dis.listFiles(domain);
+      const json = await dis.file.listFiles(domain);
 
-      if (Array.isArray(json.files)) {
+      // Backend returns array of filenames directly
+      if (Array.isArray(json)) {
+        setFiles(json);
+      } else if (Array.isArray(json.files)) {
         setFiles(json.files);
-      } else if (json && typeof json === "object") {
-        setFiles(Object.keys(json));
       } else {
         setFiles([]);
       }
@@ -62,7 +63,7 @@ export default function DomainFileList({ domainId }) {
         counter++;
       }
 
-      await dis.saveFile(domain, filename, "");
+      await dis.file.saveFile(domain, filename, "");
 
       // reload list and open editor for the new file
       await loadFiles();
@@ -112,14 +113,21 @@ export default function DomainFileList({ domainId }) {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {files.map((f) => (
-              <DomainSingleFile
-                key={f}
-                domainId={domain}
-                filename={f}
-                onDeleted={loadFiles}
-              />
-            ))}
+            {files.map((f) => {
+              // Support both old format (string) and new format (object with metadata)
+              const filename = typeof f === 'string' ? f : f.name;
+              const fileInfo = typeof f === 'object' ? f : null;
+              
+              return (
+                <DomainSingleFile
+                  key={filename}
+                  domainId={domain}
+                  filename={filename}
+                  fileInfo={fileInfo}
+                  onDeleted={loadFiles}
+                />
+              );
+            })}
           </div>
         )}
       </div>

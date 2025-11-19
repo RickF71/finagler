@@ -5,7 +5,7 @@
 
 :root {
   --fg: #ddd;
-  --bg: #111;
+  --bg: #1a1a1a;  /* Dark default, domain CSS will override */
   --accent: #0ff;
   --muted: #666;
   --border: #333;
@@ -27,13 +27,10 @@ html, body, #root {
   line-height: 1.4;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 /* --- Common building blocks --- */
 .panel {
-  background: #181818;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: var(--pad);
@@ -48,7 +45,6 @@ html, body, #root {
   gap: var(--gap);
   width: 240px;
   border-right: 1px solid var(--border);
-  background: #101010;
   padding: var(--pad);
 }
 
@@ -58,7 +54,6 @@ html, body, #root {
   justify-content: space-between;
   padding: var(--pad);
   border-bottom: 1px solid var(--border);
-  background: #161616;
 }
 
 .button {
@@ -79,7 +74,6 @@ html, body, #root {
   border: 1px solid var(--border);
   border-radius: 4px;
   padding: 6px;
-  background: #0a0a0a;
   color: var(--fg);
 }
 
@@ -89,190 +83,108 @@ html, body, #root {
   gap: 4px;
 }
 
-.text-muted {
-  color: var(--muted);
-  font-size: 0.9em;
-}
-
-.text-accent {
-  color: var(--accent);
-}
-
-.warning {
-  color: #ff6;
-  border-color: #ff6;
-}
+.text-muted { color: var(--muted); font-size: 0.9em; }
+.text-accent { color: var(--accent); }
+.warning     { color: #ff6; border-color: #ff6; }
 
 /* --- Table styles --- */
 .table {
   width: 100%;
   border-collapse: collapse;
 }
-
 .table th,
 .table td {
   padding: var(--pad);
   text-align: left;
   border-bottom: 1px solid var(--border);
 }
-
-.table th {
-  color: var(--muted);
-  background: #161616;
-}
-
-.table tr:hover {
-  background: #222;
-}
+.table th { color: var(--muted); }
+.table tr:hover { background: rgba(255,255,255,0.05); }
 
 /* --- Layout helpers --- */
-.flex-between {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.flex-gap {
-  display: flex;
-  gap: var(--gap);
-}
+.flex-between { display:flex; align-items:center; justify-content:space-between; }
+.flex-gap     { display:flex; gap:var(--gap); }
 
 .scroll-area {
-  overflow: auto;
-  max-height: 70vh;
-  border-top: 1px solid var(--border);
+  overflow:auto;
+  max-height:70vh;
+  border-top:1px solid var(--border);
 }
 
-.clickable {
-  cursor: pointer;
-}
-
-.clickable:hover {
-  text-decoration: underline;
-}
+.clickable { cursor:pointer; }
+.clickable:hover { text-decoration:underline; }
 
 /* --- Layout classes --- */
 .app-container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  background: var(--bg);
-  color: var(--fg);
+  display:flex;
+  flex-direction:column;
+  height:100vh;
 }
 
 .app-body {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
+  display:flex;
+  flex:1;
+  overflow:hidden;
+  padding-top: var(--superbar-height);
 }
 
 .main-content {
-  flex: 1;
-  overflow: auto;
-  padding: var(--pad);
+  flex:1;
+  overflow:auto;
+  padding:var(--pad);
 }
 
 .center-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:100%;
 }
 
 .center-content-column {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  gap: var(--gap);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  height:100%;
+  gap:var(--gap);
 }
 
-.fade-transition {
-  transition: opacity 300ms ease;
-}
-
-.fade-in {
-  opacity: 1;
-}
-
-.fade-out {
-  opacity: 0;
-}
+/* --- Transitions --- */
+.fade-transition { transition: opacity 300ms ease; }
+.fade-in  { opacity:1; }
+.fade-out { opacity:0; }
 
 /* --- Semantic Layout Classes --- */
-.flex {
-  display: flex;
-}
-
-.column {
-  flex-direction: column;
-}
-
-.row {
-  flex-direction: row;
-}
-
-.center {
-  align-items: center;
-  justify-content: center;
-}
+.flex   { display:flex; }
+.column { flex-direction:column; }
+.row    { flex-direction:row; }
+.center { align-items:center; justify-content:center; }
 
 /* --- Spacing Classes --- */
-.gap-sm {
-  gap: 4px;
-}
+.gap-sm { gap:4px; }
+.gap-md { gap:var(--gap); }
+.pad-sm { padding:4px; }
+.pad-md { padding:var(--pad); }
 
-.gap-md {
-  gap: var(--gap);
-}
+.loading-text { color:var(--muted); }
+.error-text   { color:#ff6; }
+.error-detail { font-size:0.9em; opacity:0.8; }
 
-.pad-sm {
-  padding: 4px;
-}
 
-.pad-md {
-  padding: var(--pad);
-}
 
-.loading-text {
-  color: var(--muted);
-}
-
-.error-text {
-  color: #ff6;
-}
-
-.error-detail {
-  font-size: 0.9em;
-  opacity: 0.8;
-}
-
-/* --- Domain scopes (for overrides) --- */
-.domain-null {
-  --bg: #000;
-  --fg: #0ff;
-  --accent: #ff0099;
-  --border: #222;
-}
-.domain-terra {
-  --bg: #101f10;
-  --fg: #bfffbf;
-  --accent: #44ff44;
-  --border: #2a2;
-}
 /* --- Additional Semantic Helpers (for Copilot mapping) --- */
-.text-sm     { font-size: 0.875rem; }
-.text-md     { font-size: 1rem; }
-.text-lg     { font-size: 1.125rem; }
-.font-bold   { font-weight: 600; }
-.font-light  { font-weight: 300; }
+.text-sm   { font-size:0.875rem; }
+.text-md   { font-size:1rem; }
+.text-lg   { font-size:1.125rem; }
+.font-bold { font-weight:600; }
+.font-light{ font-weight:300; }
 
-.rounded     { border-radius: 6px; }
-.w-full      { width: 100%; }
-.h-full      { height: 100%; }
+.rounded { border-radius:6px; }
+.w-full  { width:100%; }
+.h-full  { height:100%; }
 
-.mr-sm       { margin-right: 4px; }
-.mr-md       { margin-right: 8px; }
+.mr-sm   { margin-right:4px; }
+.mr-md   { margin-right:8px; }
 
-.scroll      { overflow: auto; }
+.scroll  { overflow:auto; }

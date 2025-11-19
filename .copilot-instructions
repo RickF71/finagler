@@ -1,47 +1,43 @@
-# Copilot instructions for Finagler Full Semantic Refactor
-# Source of truth: src/base.css
+# Copilot Investigation: Endpoint Format Mapping + Refactor Preparation
 
 Objective:
-Refactor all JSX/TSX files in the Finagler project to use semantic classNames
-defined in src/base.css instead of Tailwind utilities or inline style objects.
+Map every existing API endpoint, its supported output formats, and the structure of its responses across the DIS-Core backend.
+The goal is to prepare for a unified refactor where each endpoint supports /{format} suffixes (json, file, cbor, encrypted) and consistent JSON error handling for unsupported types.
 
-Scope:
-- Convert ALL Tailwind utility classNames (bg-*, p-*, m-*, text-*, flex, gap-*,
-  items-*, justify-*, border-*, rounded-*, shadow-*, etc.)
-- Convert ALL inline style={{…}} props to equivalent semantic classNames.
-- Remove remaining inline style props entirely.
-- Skip backend, schema, bridge, or config code (UI components only).
+Mission:
+1. Crawl all Go files under /internal/api and /routes for:
+   - Route registration lines (mux.HandleFunc, chi.Route, chi.Get/Post/Put, etc.)
+   - Functions prefixed with handle*
+   - Any switch or if/else that sets Content-Type headers
+   - Any use of w.Write([]byte(...)), w.Header().Set("Content-Type", ...)
+   - Any direct writes of text/css, text/plain, application/json, or other MIME types.
 
-Allowed Vocabulary (defined in base.css):
-panel, sidebar, toolbar, button, field, list, list-item,
-text-muted, text-accent, warning, selected,
-flex, column, row, center, flex-between, flex-gap,
-gap-sm, gap-md, pad-sm, pad-md,
-text-sm, text-md, text-lg, font-bold, font-light,
-rounded, w-full, h-full, mr-sm, mr-md, scroll, scroll-area,
-clickable, app-container, app-body, main-content, center-content, center-content-column,
-table, loading-text, error-text, error-detail, fade-transition, fade-in, fade-out
+2. For each discovered handler:
+   - Report: File, function name, line numbers, registered route pattern.
+   - List which formats it currently supports (json, file, text/css, etc.).
+   - Identify whether it currently uses the standard JSON response helper (`JSON`, `JSONError`) or manual writes.
+   - Flag any that return non-JSON errors (e.g., `http.Error`, raw text, fmt.Fprintf).
 
-Guidelines:
-- Combine classes logically: e.g. className="panel flex column gap-md"
-- Maintain all JSX structure and functional behavior exactly.
-- Do NOT invent new or one-off classNames.
-- Map inline style values to the closest semantic class (e.g. marginRight: '8px' → mr-md).
-- If a color or background style (e.g. '#00B97A', '#d97706') is present,
-  remove it and rely on domain CSS variables (--accent, --fg, --bg).
-- Preserve all React logic, state, and hooks.
+3. For handlers that serve or consume files (CSS, policy, schema, etc.):
+   - Note if they use a fixed MIME type or derive it dynamically.
+   - Identify whether they should gain `/file` or `/json` suffix support.
 
-Special Rules:
-- Dynamic inline styles using computed values (e.g. width: dynamicWidth) may remain inline.
-- When multiple style props map to the same concept (e.g. padding + gap),
-  use a single semantic equivalent if it matches intent.
-- All text/font spacing or weight should map to text-sm/text-md/text-lg or font-bold/font-light.
+4. For any handlers that already use content negotiation or file suffixes:
+   - Document how it’s implemented (route param, header, etc.).
+   - Suggest whether it can migrate easily to the new unified pattern.
 
-Verification:
-After each batch, run `npm run dev` to confirm visuals and interactivity are unchanged.
-Domain theme switching should still affect colors and accents correctly.
+5. Output a structured summary (Markdown table):
+   - Columns: Route | Method | Handler | Current Formats | Uses JSON Helpers | Suggested Formats | File Path
+   - Followed by a short narrative summary highlighting where refactor complexity lies.
 
-Notes:
-src/base.css defines the canonical design vocabulary.
-If future helper classes are added there, Copilot may use them automatically.
-Never modify base.css automatically — all new helpers must be added manually.
+Expected Output:
+- A concise Markdown table summarizing all current endpoint formats and handler implementations.
+- Identification of handlers that need changes to support the new /{format} suffix pattern.
+- List of all endpoints not yet using JSONError or JSONUnsupportedFormat.
+- Clear “refactor targets” list to guide Copilot or manual implementation next.
+
+Follow-up Mission:
+After mapping is complete, generate the refactor plan:
+- Define standard format-switch skeleton for each handler (json/file/cbor/encrypted).
+- Replace non-JSON error responses with JSONUnsupportedFormat.
+- Add JSONError/JSON helpers to handlers that lack them.

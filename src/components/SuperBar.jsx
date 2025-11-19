@@ -1,68 +1,73 @@
 // src/components/SuperBar.jsx
-import React, { useEffect, useState } from "react";
-import { useFinagler } from "../context/FinaglerContext.jsx";
+import React, { useEffect } from "react";
+import { useDisStatus } from "../hooks/useDisStatus.js";
+import { useActiveUser } from "../context/ActiveUserContext.jsx";
 import { useDomain } from "../context/DomainContext.jsx";
-import { useDisCorePayload } from "../context/DisCorePayloadContext.jsx";
 import finaglerIcon from "../assets/finagler-icon.png";
 
 export default function SuperBar() {
-  const { connected, version } = useFinagler();
-  const { activeDomainId, setActiveDomainId, NONE_DOMAIN_ID, API_BASE } = useDomain();
-  const { setDomain } = useDisCorePayload();
-  const [domains, setDomains] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const serverOnline = useDisStatus(); // dis-core responds to ping
+  const { activeUser } = useActiveUser();
+  const { domain, activeDomainId } = useDomain();
 
-  // Load all domains globally (not tied to a specific one)
-  useEffect(() => {
-    if (!connected) return;
+  // DIS network connection = authenticated AND bound to corporeal domain
+  const disConnected = activeUser?.authenticated && activeUser?.bound;
 
-    async function loadDomains() {
-      try {
-        setLoading(true);
-        const res = await fetch(`${API_BASE}/api/domains`);
-        if (!res.ok) throw new Error(`Failed to list domains: ${res.statusText}`);
-        const data = await res.json();
-        setDomains(Array.isArray(data) ? data : []);
-      } catch (err) {
-        console.error("Failed to load domain list:", err);
-        setDomains([]);
-      } finally {
-        setLoading(false);
-      }
-    }
+  // Status indicator: green (DIS connected), yellow (ping only), gray (offline)
+  const statusColor = disConnected 
+    ? 'bg-green-500' 
+    : serverOnline 
+      ? 'bg-yellow-500' 
+      : 'bg-gray-500';
+  
+  const statusText = disConnected 
+    ? 'connected' 
+    : serverOnline 
+      ? 'ping only' 
+      : 'offline';
 
-    loadDomains();
-  }, [connected, API_BASE]);
+  const statusTitle = disConnected
+    ? 'Connected to DIS network'
+    : serverOnline
+      ? 'Server online, not bound to corporeal domain'
+      : 'Server offline';
 
-  // Unified domain switch handler
-  function handleSelect(e) {
-    const newDomainId = e.target.value;
-    setActiveDomainId(newDomainId);
-    setDomain(newDomainId); // triggers DisCorePayload state machine
-  }
+  // Build domain ancestry path for breadcrumb display
+  const ancestry = domain?.ancestry || [];
+  const displayPath = ancestry.length > 0
+    ? ancestry.map(d => d.name || d.id).join(" › ")
+    : (domain?.name || activeDomainId);
 
   return (
-    <header className="fixed top-0 left-0 right-0 flex items-center justify-between h-9 min-h-[36px] w-full px-4 bg-slate-900 border-b border-slate-800 z-50">
-      <div className="flex items-center gap-2">
+    <header className="fixed top-0 left-0 right-0 flex items-center justify-between w-full px-4 bg-slate-900 border-b border-slate-800 z-[1000]" style={{ height: 'var(--superbar-height)' }}>
+      {/* Left: Logo + Status */}
+      <div className="flex items-center gap-3">
         <img src={finaglerIcon} alt="Finagler" className="h-5 w-auto" />
         <span className="text-sm font-semibold text-slate-200">
-          Finagler {connected ? `(v${version})` : "(offline)"}
+          Finagler
+        </span>
+        <div className="flex items-center gap-1">
+          <div 
+            className={`w-2 h-2 rounded-full ${statusColor}`}
+            title={statusTitle}
+          />
+          <span className="text-xs text-slate-400">
+            {statusText}
+          </span>
+        </div>
+      </div>
+
+      {/* Center: Domain Path / Breadcrumb */}
+      <div className="flex-grow text-center">
+        <span className="text-sm font-mono text-amber-400">
+          {displayPath}
         </span>
       </div>
 
-      <select
-        value={activeDomainId}
-        onChange={handleSelect}
-        disabled={!connected || loading}
-        className="bg-slate-800 text-slate-200 text-xs rounded px-2 py-1 border border-slate-700"
-      >
-        <option value={NONE_DOMAIN_ID}>— Finagler —</option>
-        {domains.map((d) => (
-          <option key={d.id} value={d.id}>
-            {d.name || d.id}
-          </option>
-        ))}
-      </select>
+      {/* Right: Reserved for auth request indicator */}
+      <div className="flex items-center gap-2">
+        {/* TODO: Add auth request count/icon here when implemented */}
+      </div>
     </header>
   );
 }

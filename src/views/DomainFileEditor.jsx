@@ -5,19 +5,30 @@ import { toast } from "react-hot-toast";
 import { createDISInterface } from "../dis/interface.js";
 import { useDomain } from "../context/DomainContext.jsx";
 
-export default function DomainFileEditor({ domainId, filename: initialFilename }) {
-  const { setView, setActiveFile } = useUI();
-  const { API_BASE } = useDomain();
+export default function DomainFileEditor() {
+  const { setView, activeFile, setActiveFile } = useUI();
+  const { activeDomainId, API_BASE } = useDomain();
 
-  const [filename, setFilename] = useState(initialFilename);
+  const [filename, setFilename] = useState(activeFile || "");
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [renaming, setRenaming] = useState(false);
-  const [newName, setNewName] = useState(initialFilename);
+  const [newName, setNewName] = useState(activeFile || "");
   
   // Initialize DIS interface
   const dis = createDISInterface(API_BASE);
+  
+  // Use activeDomainId from context
+  const domainId = activeDomainId;
+  
+  // Update filename when activeFile changes
+  useEffect(() => {
+    if (activeFile) {
+      setFilename(activeFile);
+      setNewName(activeFile);
+    }
+  }, [activeFile]);
 
   // -------------------------------------------------------
   // Load file contents
@@ -25,7 +36,7 @@ export default function DomainFileEditor({ domainId, filename: initialFilename }
   useEffect(() => {
     if (!domainId || !filename) return;
     setLoading(true);
-    dis.getFile(domainId, filename)
+    dis.file.getFile(domainId, filename)
       .then((t) => setContent(t))
       .catch((err) => toast.error(`Load failed: ${err.message}`))
       .finally(() => setLoading(false));
@@ -38,7 +49,7 @@ export default function DomainFileEditor({ domainId, filename: initialFilename }
     if (!domainId || !filename) return;
     try {
       setSaving(true);
-      await dis.saveFile(domainId, filename, content);
+      await dis.file.saveFile(domainId, filename, content);
       toast.success(`${filename} saved`);
       setActiveFile(null);
       setView("files");
@@ -61,9 +72,9 @@ export default function DomainFileEditor({ domainId, filename: initialFilename }
     try {
       setRenaming(true);
       // First save content to new filename
-      await dis.saveFile(domainId, newName, content);
+      await dis.file.saveFile(domainId, newName, content);
       // Then delete old file
-      await dis.deleteFile(domainId, filename);
+      await dis.file.deleteFile(domainId, filename);
 
       toast.success(`Renamed to ${newName}`);
       setFilename(newName);
@@ -80,10 +91,10 @@ export default function DomainFileEditor({ domainId, filename: initialFilename }
   // Render
   // -------------------------------------------------------
   return (
-    <div className="flex flex-col h-full bg-slate-900/80 rounded-2xl border border-slate-700 shadow-xl">
+    <div className="panel column h-full" style={{ borderRadius: '16px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}>
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700 bg-slate-950/70 rounded-t-2xl">
-        <div className="flex items-center gap-3">
+      <div className="toolbar" style={{ padding: '12px 16px', borderRadius: '16px 16px 0 0' }}>
+        <div className="flex center gap-sm">
           {renaming ? (
             <input
               autoFocus
@@ -91,36 +102,43 @@ export default function DomainFileEditor({ domainId, filename: initialFilename }
               onChange={(e) => setNewName(e.target.value)}
               onBlur={handleRename}
               onKeyDown={(e) => e.key === "Enter" && handleRename()}
-              className="bg-transparent border-b border-amber-400 outline-none text-lg px-1 text-amber-300 font-semibold"
+              className="field text-lg font-bold text-accent"
+              style={{ background: 'transparent', borderBottom: '1px solid var(--accent)', outline: 'none', padding: '4px' }}
             />
           ) : (
             <h2
               onClick={() => setRenaming(true)}
-              className="cursor-pointer text-lg font-semibold text-amber-300 hover:text-amber-400 transition"
+              className="text-lg font-bold text-accent"
+              style={{ cursor: 'pointer', transition: 'color 0.2s' }}
               title="Click to rename"
             >
               {filename}
             </h2>
           )}
-          <span className="text-xs text-slate-400">
+          <span className="text-sm text-muted">
             Domain: {domainId}
           </span>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-sm">
           <button
             onClick={() => {
               setActiveFile(null);
               setView("files");
             }}
-            className="px-3 py-1 text-sm rounded bg-slate-700 hover:bg-slate-600 text-slate-200"
+            className="button text-sm"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
             disabled={saving}
-            className="px-3 py-1 text-sm rounded bg-amber-500 hover:bg-amber-600 text-slate-900 font-medium shadow-md disabled:opacity-60"
+            className="button text-sm font-bold"
+            style={{ 
+              backgroundColor: '#f59e0b',
+              color: 'black',
+              ...(saving ? { opacity: '0.6' } : {})
+            }}
           >
             {saving ? "Saving…" : "Save"}
           </button>
@@ -128,14 +146,21 @@ export default function DomainFileEditor({ domainId, filename: initialFilename }
       </div>
 
       {/* Body */}
-      <div className="flex-1 p-4 overflow-auto">
+      <div className="pad-md" style={{ flex: '1', overflow: 'auto' }}>
         {loading ? (
-          <div className="text-slate-400 text-sm">Loading...</div>
+          <div className="text-muted text-sm">Loading...</div>
         ) : (
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="w-full h-full bg-slate-900 text-slate-100 rounded-lg border border-slate-700 p-3 font-mono text-sm focus:border-amber-400 focus:outline-none"
+            className="field"
+            style={{ 
+              width: '100%', 
+              height: '100%', 
+              fontFamily: 'monospace', 
+              fontSize: '0.875rem',
+              resize: 'none'
+            }}
           />
         )}
       </div>

@@ -43,21 +43,29 @@ export default function DomainDeck() {
   };
 
   return (
-    <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+    <div className="pad-md" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
       {domains.map((d) => (
         <div
           key={d.id}
-          className={`rounded-2xl shadow-lg p-4 border-2 transition-all duration-200 cursor-pointer ${
-            active === d.id
-              ? "border-yellow-400 bg-yellow-900/10"
-              : "border-gray-700 bg-gray-800/40"
+          className={`panel pad-md ${
+            active === d.id ? 'selected' : ''
           }`}
+          style={{ 
+            cursor: 'pointer',
+            borderRadius: '16px',
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+            transition: 'all 0.2s',
+            ...(active === d.id ? {
+              borderColor: 'var(--accent)',
+              backgroundColor: 'rgba(255, 255, 0, 0.1)'
+            } : {})
+          }}
           onClick={() => activate(d.id)}
         >
-          <h2 className="text-xl font-bold text-yellow-300 mb-2">
+          <h2 className="text-lg font-bold text-accent" style={{ marginBottom: '8px' }}>
             {d.name || d.id}
           </h2>
-          <p className="text-sm opacity-80">{d.description || "—"}</p>
+          <p className="text-sm text-muted">{d.description || "—"}</p>
         </div>
       ))}
     </div>

@@ -1,6 +1,5 @@
 // src/DisCorePayloadView.jsx
 import React, { useEffect, useState } from "react";
-import { useDisCorePayload } from "./context/DisCorePayloadContext.jsx";
 import { useDomain } from "./context/DomainContext.jsx";
 import SuperBar from "./components/SuperBar.jsx";
 import Sidebar from "./components/Sidebar.jsx";
@@ -9,11 +8,9 @@ import useDomainCSS from "./hooks/useDomainCSS.js";
 import NoneView from "./views/NoneView.jsx";
 
 export default function DisCorePayloadView() {
-  const { payload } = useDisCorePayload();
-  const { activeDomainId, NONE_DOMAIN_ID } = useDomain();
+  const { domain, activeDomainId, NONE_DOMAIN_ID } = useDomain();
 
-  const state = payload.domain?.state || "none";
-  const domain = payload.domain;
+  const state = domain?.state || "none";
   const [fadeClass, setFadeClass] = useState("fade-out");
 
   useDomainCSS(); // 

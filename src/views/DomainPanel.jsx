@@ -19,6 +19,7 @@ import ReconcileSchemas from "./ReconcileSchemas";
 import NetworkGraph from "./NetworkGraph";
 import TerraView from "./TerraView";
 import ImportView from "./ImportView";
+import Console from "./Console";
 import DomainGraphView from "../components/DomainGraphView";
 import AdminPanel from "../components/AdminPanel";
 //import DomainSorter from "./DomainSorter";
@@ -88,6 +89,9 @@ export default function DomainPanel() {
 
     case "graph":
       return <DomainGraphView />;
+
+    case "console":
+      return <Console />;
 
     case "admin":
       return <AdminPanel userRole="root" authToken="admin-root-token" />;

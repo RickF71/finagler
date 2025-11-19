@@ -76,10 +76,10 @@ export const createDISInterface = (API_BASE) => ({
 
 
     async saveDomainCSS(domainId, css) {
-      const res = await fetch(`${API_BASE}/api/domain/${domainId}/css`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ css }),
+      const res = await fetch(`${API_BASE}/api/domain/${domainId}/css/text`, {
+        method: "PUT",
+        headers: { "Content-Type": "text/plain" },
+        body: css,
       });
       if (!res.ok) throw new Error(`saveDomainCSS failed: ${res.status}`);
       return res.ok;
@@ -181,6 +181,18 @@ export const createDISInterface = (API_BASE) => ({
     async listReceipts(domainId) {
       const res = await fetch(`${API_BASE}/api/domain/${domainId}/receipts`);
       if (!res.ok) throw new Error(`listReceipts failed: ${res.status}`);
+      return res.json();
+    },
+
+    async getDashboard() {
+      const res = await fetch(`${API_BASE}/api/receipts/dashboard`);
+      if (!res.ok) throw new Error(`getReceiptsDashboard failed: ${res.status}`);
+      return res.json();
+    },
+
+    async listAll(limit = 50) {
+      const res = await fetch(`${API_BASE}/api/receipts/list?limit=${limit}`);
+      if (!res.ok) throw new Error(`listAllReceipts failed: ${res.status}`);
       return res.json();
     },
   },

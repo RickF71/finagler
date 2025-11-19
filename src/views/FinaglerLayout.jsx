@@ -9,19 +9,19 @@ export default function FinaglerLayout() {
   const { activeDomainId } = useDomain();
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-950 text-slate-100">
+    <div className="app-container">
       <SuperBar />
-      <div className="pt-9 flex flex-1 items-center justify-center">
+      <div className="center" style={{ paddingTop: '36px', flex: '1' }}>
         {connected ? (
-          <div className="text-center text-slate-400">
+          <div className="center column gap-sm text-muted">
             <p>Connected to DIS-Core v{version}</p>
-            <p className="text-xs text-slate-500 mt-2">
+            <p className="text-sm" style={{ marginTop: '8px' }}>
               Domain: {activeDomainId} (none selected)
             </p>
-            <p className="text-sm mt-3">Select a domain to begin.</p>
+            <p style={{ marginTop: '12px' }}>Select a domain to begin.</p>
           </div>
         ) : (
-          <p className="text-slate-600">Connecting to DIS-Core…</p>
+          <p className="text-muted">Connecting to DIS-Core…</p>
         )}
       </div>
     </div>

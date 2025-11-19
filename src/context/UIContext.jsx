@@ -27,6 +27,11 @@ export function UIProvider({ children }) {
   const [activeFile, setActiveFile] = useState(null);
 
   // -----------------------------------------
+  // View data for passing parameters between views (GOV-11E)
+  // -----------------------------------------
+  const [viewData, setViewData] = useState(null);
+
+  // -----------------------------------------
   // Ensure we start in a clean state on first mount
   // -----------------------------------------
   useEffect(() => {
@@ -75,6 +80,8 @@ export function UIProvider({ children }) {
         setView,
         activeFile,
         setActiveFile,
+        viewData,
+        setViewData,
         overlay,
         setOverlay,
         theme,
